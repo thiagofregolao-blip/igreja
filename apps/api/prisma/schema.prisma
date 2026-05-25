@@ -1,0 +1,208 @@
+// Prisma schema — Catedral Sagrado Corazón Bingo System
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
+enum Language {
+  pt
+  es
+}
+
+enum TicketStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+enum CouponStatus {
+  AVAILABLE
+  RESERVED
+  PENDING
+  SOLD
+}
+
+enum PaymentMethod {
+  BANK_TRANSFER
+  BANCARD
+}
+
+enum PaymentStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
+}
+
+model User {
+  id                String    @id @default(uuid())
+  name              String
+  cedula            String    @unique
+  phone             String
+  email             String    @unique
+  passwordHash      String
+  role              Role      @default(CUSTOMER)
+  preferredLanguage Language  @default(pt)
+  isBlocked         Boolean   @default(false)
+  resetToken        String?
+  resetTokenExpires DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  tickets           Ticket[]
+  payments          Payment[]
+
+  @@index([email])
+  @@index([cedula])
+}
+
+model Event {
+  id              String    @id @default(uuid())
+  name            String
+  nameEs          String
+  location        String
+  description     String?
+  descriptionEs   String?
+  eventDate       DateTime
+  startTime       String    @default("20:00")
+  maxCoupons      Int
+  couponPrice     Int       @default(100000)
+  cardsPerCoupon  Int       @default(2)
+  drawCount       Int       @default(5)
+  mainPrizeValue  Int       @default(0)
+  totalPrizeValue Int       @default(0)
+  heroImageUrl    String?
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  draws           Draw[]
+  coupons         Coupon[]
+  tickets         Ticket[]
+  sponsors        Sponsor[]
+
+  @@index([isActive])
+}
+
+model Sponsor {
+  id         String   @id @default(uuid())
+  eventId    String
+  event      Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name       String
+  logoUrl    String
+  websiteUrl String?
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  @@index([eventId])
+}
+
+model Draw {
+  id           String       @id @default(uuid())
+  eventId      String
+  event        Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  order        Int
+  prizeName    String
+  prizeNameEs  String
+  prizeValue   Int
+  winnerCardId String?
+  drawnAt      DateTime?
+  createdAt    DateTime     @default(now())
+  drawNumbers  DrawNumber[]
+
+  @@unique([eventId, order])
+  @@index([eventId])
+}
+
+model Coupon {
+  id           String       @id @default(uuid())
+  eventId      String
+  event        Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  couponNumber Int
+  status       CouponStatus @default(AVAILABLE)
+  reservedAt   DateTime?
+  reservedBy   String?
+  reservedSessionId String?
+  ticketId     String?
+  ticket       Ticket?      @relation(fields: [ticketId], references: [id])
+  cards        Card[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@unique([eventId, couponNumber])
+  @@index([eventId, status])
+  @@index([ticketId])
+}
+
+model Card {
+  id          String       @id @default(uuid())
+  couponId    String
+  coupon      Coupon       @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  cardNumber  Int
+  cardIndex   Int
+  imageUrl    String?
+  drawNumbers DrawNumber[]
+  createdAt   DateTime     @default(now())
+
+  @@index([couponId])
+}
+
+model DrawNumber {
+  id      String @id @default(uuid())
+  cardId  String
+  card    Card   @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  drawId  String
+  draw    Draw   @relation(fields: [drawId], references: [id], onDelete: Cascade)
+  numbers Int[]
+
+  @@unique([cardId, drawId])
+  @@index([cardId])
+  @@index([drawId])
+}
+
+model Ticket {
+  id           String       @id @default(uuid())
+  eventId      String
+  event        Event        @relation(fields: [eventId], references: [id])
+  userId       String
+  user         User         @relation(fields: [userId], references: [id])
+  ticketNumber Int
+  status       TicketStatus @default(PENDING)
+  totalAmount  Int
+  coupons      Coupon[]
+  payment      Payment?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  paidAt       DateTime?
+
+  @@unique([eventId, ticketNumber])
+  @@index([userId])
+  @@index([eventId, status])
+}
+
+model Payment {
+  id          String        @id @default(uuid())
+  ticketId    String        @unique
+  ticket      Ticket        @relation(fields: [ticketId], references: [id])
+  userId      String
+  user        User          @relation(fields: [userId], references: [id])
+  method      PaymentMethod @default(BANK_TRANSFER)
+  amount      Int
+  receiptUrl  String?
+  status      PaymentStatus @default(PENDING)
+  confirmedAt DateTime?
+  confirmedBy String?
+  notes       String?
+  bancardRef  String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([status])
+  @@index([userId])
+}
