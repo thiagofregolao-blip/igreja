@@ -1,0 +1,17 @@
+# Deploy ÚNICO no Railway: a API serve web (/) e admin (/admin) no mesmo processo.
+# --include=dev é necessário porque o Railway define NODE_ENV=production e, sem isso,
+# o npm pula as devDependencies (vite, typescript, prisma CLI) e o build quebra.
+[phases.setup]
+nixPkgs = ["nodejs_20", "openssl"]
+
+[phases.install]
+cmds = ["npm ci --include=dev"]
+
+[phases.build]
+cmds = [
+  "npx prisma generate --schema=apps/api/prisma/schema.prisma",
+  "npm run build"
+]
+
+[start]
+cmd = "npx prisma migrate deploy --schema=apps/api/prisma/schema.prisma && npm run start:api"
