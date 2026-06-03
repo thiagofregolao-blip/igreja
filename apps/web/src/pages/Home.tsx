@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { api } from '@/lib/api';
 import { formatLongDatePT, formatLongDateES, millionsLabel } from '@/lib/format';
+import { BilheteMaster } from '@/components/BilheteMaster';
+import { Sponsors } from '@/components/Sponsors';
+import { MASTER_SPONSORS } from '@/data/sponsors';
 import type { EventSummary } from '@catedral/types';
 
 export default function Home() {
@@ -23,83 +26,24 @@ export default function Home() {
 
   const fmt = isEs ? formatLongDateES(event.eventDate) : formatLongDatePT(event.eventDate);
   const totalM = millionsLabel(event.totalPrizeValue);
-  const mainM = millionsLabel(event.mainPrizeValue);
   const drawValues = distributeDraws(event.totalPrizeValue, event.mainPrizeValue, event.drawCount);
 
   return (
     <div className="max-w-[1480px] mx-auto px-6 md:px-9 pb-16 pt-6 animate-fade-in">
-      {/* ============ HERO ============ */}
-      <section
-        className="relative grid grid-cols-1 lg:grid-cols-[280px_1fr_280px] gap-12 lg:gap-12 items-center pt-12 pb-8"
-        style={{ minHeight: 600 }}
-      >
-        {/* DATE CARD */}
-        <div className="relative w-full max-w-[280px] mx-auto bg-date-card rounded-[30px] text-white text-center"
-             style={{ padding: '86px 28px 30px', boxShadow: '0 40px 70px -28px rgba(15,15,25,.55), inset 0 1px 0 rgba(255,255,255,.04), inset 0 0 0 1px rgba(255,255,255,.03)' }}>
-          <div className="absolute left-1/2 -top-[34px] -translate-x-1/2 w-[68px] h-[68px] rounded-full flex items-center justify-center"
-               style={{ background: 'linear-gradient(180deg,#1c2030 0%,#101320 100%)', border: '1px solid rgba(230,184,54,.4)', boxShadow: '0 12px 26px -10px rgba(0,0,0,.55)' }}>
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e7b53a" strokeWidth="2">
-              <rect x="3" y="5" width="18" height="16" rx="2" />
-              <path d="M3 9h18M8 3v4M16 3v4" />
-              <rect x="7" y="12" width="3" height="3" fill="#e7b53a" stroke="none" />
-            </svg>
-          </div>
-          <div className="text-[11px] font-heavy tracking-[.3em] text-white/70 mb-2">{t('hero.drawDate')}</div>
-          <div className="font-display text-white" style={{ fontSize: 120, lineHeight: 1, letterSpacing: '-.02em', margin: '6px 0 14px' }}>{fmt.day}</div>
-          <div className="font-heavy tracking-[.18em] text-gold-500 text-sm">DE {fmt.month}</div>
-          <div className="text-[13px] text-white/65 tracking-[.32em] mt-2 font-heavy">{fmt.year}</div>
-          <div className="divider-gold my-5 mx-1" />
-          <div className="inline-flex items-center gap-2.5 font-heavy tracking-[.16em] text-white text-[13px]">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e7b53a" strokeWidth="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-            {fmt.time}
-          </div>
-        </div>
-
-        {/* CENTER */}
-        <div className="text-center relative">
-          <div className="text-[13px] tracking-[.32em] font-heavy uppercase mb-3.5" style={{ color: '#3b3a36' }}>
-            {t('hero.subtitle')}
-          </div>
-          <div className="text-gold-gradient whitespace-nowrap"
-               style={{ fontSize: 'min(280px, 22vw)', lineHeight: 0.86, letterSpacing: '-.04em', marginBottom: 10, fontFamily: 'Archivo, sans-serif', fontWeight: 800 }}>
-            {totalM}
-          </div>
-          <div className="flex flex-col items-center gap-[18px] mt-1.5">
-            <div className="text-ink-900 whitespace-nowrap"
-                 style={{ fontSize: 'min(128px, 10vw)', lineHeight: 0.9, letterSpacing: '-.025em', fontFamily: 'Archivo, sans-serif', fontWeight: 800 }}>
-              {t('hero.millions')}
-            </div>
-            <div className="inline-block bg-gold-soft text-[#1a1408] rounded-[12px] font-heavy tracking-[.18em] text-[18px]"
-                 style={{ padding: '10px 28px', boxShadow: '0 14px 26px -10px rgba(230,184,54,.55), inset 0 1px 0 rgba(255,255,255,.4)' }}>
-              {t('hero.inCash')}
-            </div>
-          </div>
-          <div className="mt-6 text-[14px] tracking-[.22em] font-heavy uppercase" style={{ color: '#3b3a36' }}>
-            {event.drawCount} SORTEIOS &nbsp;•&nbsp;
-            <b className="text-gold-700">{totalM} {t('hero.millions')}</b> EM DINHEIRO EM PRÊMIOS
-          </div>
-          <Link to={`/events/${event.id}`} className="btn-dark mt-8">
-            <svg className="w-5 h-5 text-gold-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-              <path d="M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4V9z"/>
-              <path d="M9 7v10"/>
-            </svg>
-            {t('nav.cta')}
-          </Link>
-        </div>
-
-        {/* PRIZE CARD */}
-        <div className="relative w-full max-w-[280px] mx-auto bg-prize-card rounded-[30px] text-center"
-             style={{ padding: '86px 28px 30px', boxShadow: '0 40px 70px -28px rgba(60,45,15,.25), inset 0 1px 0 rgba(255,255,255,.7), inset 0 0 0 1px rgba(15,17,25,.04)' }}>
-          <div className="absolute left-1/2 -top-[34px] -translate-x-1/2 w-[68px] h-[68px] rounded-full flex items-center justify-center text-gold-700"
-               style={{ background: 'linear-gradient(180deg,#ffffff 0%,#f1ead8 100%)', border: '1px solid rgba(230,184,54,.5)', boxShadow: '0 12px 26px -12px rgba(60,45,15,.3)' }}>
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>
-          </div>
-          <div className="text-[11px] font-heavy tracking-[.3em] mb-2" style={{ color: '#3b3a36' }}>{t('hero.mainPrize')}</div>
-          <div className="font-display text-ink-900" style={{ fontSize: 120, lineHeight: 1, letterSpacing: '-.02em', margin: '6px 0 4px' }}>{mainM}</div>
-          <div className="font-heavy tracking-[.18em] text-gold-700 text-[18px] mb-4">{t('hero.millions')}</div>
-          <div className="text-[11.5px] tracking-[.32em] font-heavy" style={{ color: '#3b3a36' }}>{t('hero.millionsLabel')}</div>
-        </div>
-      </section>
+      {/* ============ HERO: BILHETE MASTER ============ */}
+      <BilheteMaster
+        masters={MASTER_SPONSORS}
+        isEs={Boolean(isEs)}
+        info={{
+          day: fmt.day,
+          month: fmt.month,
+          year: fmt.year,
+          time: fmt.time,
+          totalM,
+          drawCount: event.drawCount,
+          eventId: event.id,
+        }}
+      />
 
       {/* ============ BOTTOM PANEL ============ */}
       <section className="card-dark rounded-[28px] text-white mt-7" id="prizes"
@@ -214,6 +158,8 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ============ PATROCINADORES ============ */}
+      <Sponsors isEs={Boolean(isEs)} />
     </div>
   );
 }
