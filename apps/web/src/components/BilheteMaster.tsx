@@ -63,35 +63,32 @@ export function BilheteMaster({
       >
         <div className="relative grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] rounded-[21px] overflow-hidden bg-[#0c0e14]">
           {/* ===== LADO 1: arte do master ===== */}
-          <div className="relative min-h-[200px] lg:min-h-[330px] overflow-hidden">
+          <div className="relative aspect-[3/2] lg:aspect-auto lg:min-h-[330px] overflow-hidden bg-[#0c0e14]">
             {showImg ? (
               <img
                 src={master.image}
                 alt={master.name}
                 onError={() => setImgError(true)}
-                className="absolute inset-0 w-full h-full object-cover"
+                className="absolute inset-0 w-full h-full object-cover object-center"
               />
             ) : (
               <MasterPlaceholder name={master?.name ?? ''} slogan={master?.slogan} isEs={isEs} />
             )}
+            {/* leve escurecimento na emenda (desktop) p/ destacar a picotagem */}
             <div
-              className="absolute inset-0 pointer-events-none"
-              style={{ background: 'linear-gradient(90deg,transparent 60%,rgba(12,14,20,.55) 100%)' }}
+              className="hidden lg:block absolute inset-0 pointer-events-none"
+              style={{ background: 'linear-gradient(90deg,transparent 72%,rgba(12,14,20,.5) 100%)' }}
             />
-            {/* badge */}
-            <div
-              className="absolute top-3.5 left-3.5 z-[4] inline-flex items-center gap-1.5 rounded-full text-gold-500 font-heavy uppercase"
-              style={{
-                background: 'rgba(8,10,14,.72)',
-                border: '1px solid rgba(230,184,54,.5)',
-                padding: '7px 12px',
-                fontSize: 9.5,
-                letterSpacing: '.18em',
-              }}
-            >
-              ★ {isEs ? 'Patrocinador Master' : 'Patrocinador Master'}
-            </div>
-            {/* dots */}
+            {/* selo (só no placeholder — a arte real já traz "patrocinador oficial") */}
+            {!showImg && (
+              <div
+                className="absolute top-3.5 left-3.5 z-[4] inline-flex items-center gap-1.5 rounded-full text-gold-500 font-heavy uppercase"
+                style={{ background: 'rgba(8,10,14,.72)', border: '1px solid rgba(230,184,54,.5)', padding: '7px 12px', fontSize: 9.5, letterSpacing: '.18em' }}
+              >
+                ★ Patrocinador Master
+              </div>
+            )}
+            {/* dots do carrossel */}
             {count > 1 && (
               <div className="absolute bottom-3.5 left-4 z-[4] flex gap-[7px]">
                 {masters.map((_, i) => (
@@ -100,35 +97,23 @@ export function BilheteMaster({
                     aria-label={`Patrocinador ${i + 1}`}
                     onClick={() => setIdx(i)}
                     className="rounded-full transition-all"
-                    style={{
-                      width: i === idx ? 20 : 7,
-                      height: 7,
-                      background: i === idx ? '#e6b836' : 'rgba(255,255,255,.4)',
-                    }}
+                    style={{ width: i === idx ? 20 : 7, height: 7, background: i === idx ? '#e6b836' : 'rgba(255,255,255,.55)' }}
                   />
                 ))}
               </div>
             )}
           </div>
 
-          {/* perfuração — desktop (vertical) */}
-          <div className="hidden lg:block absolute top-0 bottom-0 z-[6] pointer-events-none" style={{ left: '58.33%' }}>
-            <div className="absolute top-[18px] bottom-[18px] -left-px" style={{ borderLeft: '2px dashed rgba(230,184,54,.45)' }} />
-            <div className="absolute -left-[13px] -top-[13px] w-[26px] h-[26px] rounded-full" style={{ background: '#f3efe6', boxShadow: 'inset 0 0 0 2px rgba(230,184,54,.25)' }} />
-            <div className="absolute -left-[13px] -bottom-[13px] w-[26px] h-[26px] rounded-full" style={{ background: '#f3efe6', boxShadow: 'inset 0 0 0 2px rgba(230,184,54,.25)' }} />
-          </div>
-
           {/* ===== LADO 2: canhoto com dados do bingo ===== */}
           <div
-            className="relative flex flex-col justify-center px-7 py-6"
-            style={{ background: 'linear-gradient(180deg,#141823 0%,#0c0e14 100%)' }}
+            className="relative flex flex-col justify-center px-7 py-6 border-t-2 lg:border-t-0 lg:border-l-2 border-dashed"
+            style={{ background: 'linear-gradient(180deg,#141823 0%,#0c0e14 100%)', borderColor: 'rgba(230,184,54,.45)' }}
           >
-            {/* perfuração — mobile (horizontal, no topo do canhoto) */}
-            <div className="lg:hidden absolute -top-px left-0 right-0 z-[6] pointer-events-none">
-              <div className="absolute left-[18px] right-[18px] top-0" style={{ borderTop: '2px dashed rgba(230,184,54,.45)' }} />
-              <div className="absolute -left-[13px] -top-[13px] w-[26px] h-[26px] rounded-full" style={{ background: '#f3efe6', boxShadow: 'inset 0 0 0 2px rgba(230,184,54,.25)' }} />
-              <div className="absolute -right-[13px] -top-[13px] w-[26px] h-[26px] rounded-full" style={{ background: '#f3efe6', boxShadow: 'inset 0 0 0 2px rgba(230,184,54,.25)' }} />
-            </div>
+            {/* furos da picotagem — alinham sempre com a emenda real */}
+            <span className="lg:hidden absolute -top-[13px] -left-[13px] w-[26px] h-[26px] rounded-full z-[6]" style={{ background: '#f3efe6', boxShadow: 'inset 0 0 0 2px rgba(230,184,54,.25)' }} />
+            <span className="lg:hidden absolute -top-[13px] -right-[13px] w-[26px] h-[26px] rounded-full z-[6]" style={{ background: '#f3efe6', boxShadow: 'inset 0 0 0 2px rgba(230,184,54,.25)' }} />
+            <span className="hidden lg:block absolute -left-[13px] -top-[13px] w-[26px] h-[26px] rounded-full z-[6]" style={{ background: '#f3efe6', boxShadow: 'inset 0 0 0 2px rgba(230,184,54,.25)' }} />
+            <span className="hidden lg:block absolute -left-[13px] -bottom-[13px] w-[26px] h-[26px] rounded-full z-[6]" style={{ background: '#f3efe6', boxShadow: 'inset 0 0 0 2px rgba(230,184,54,.25)' }} />
 
             <div className="flex items-center gap-2.5">
               <div className="w-[26px] h-[26px] rounded-full flex items-center justify-center text-[#3a2a06] font-extrabold text-[13px]" style={{ background: GOLD_SHINE }}>✚</div>

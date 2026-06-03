@@ -1,0 +1,21 @@
+ARTES DOS PATROCINADORES MASTER
+===============================
+
+Coloque aqui os banners dos patrocinadores master (os que aparecem no
+bilhete dourado da home, em carrossel).
+
+COMO ADICIONAR:
+1. Salve a arte nesta pasta com um nome simples, ex.: somax.jpg
+2. No arquivo apps/web/src/data/sponsors.ts, o patrocinador aponta para
+   o caminho "/sponsors/NOME-DO-ARQUIVO".
+   Ex.: image: '/sponsors/somax.jpg'
+
+ESPECIFICAÇÕES IDEAIS:
+- Proporção 3:2 (ex.: 1536 x 1024) — igual à arte que você já tem.
+- PNG ou JPG.
+- Peso de preferência abaixo de ~500 KB (otimize para web).
+
+OBS:
+- Se a imagem não existir/der erro, o bilhete mostra um placeholder
+  automaticamente — nada quebra.
+- Na Fase 2 (admin), o upload será feito pelo painel, sem mexer aqui.

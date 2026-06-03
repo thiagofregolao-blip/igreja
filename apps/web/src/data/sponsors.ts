@@ -27,10 +27,10 @@ export interface TierSponsor {
 /** Patrocinadores MASTER — aparecem no bilhete dourado (carrossel) no topo. */
 export const MASTER_SPONSORS: MasterSponsor[] = [
   {
-    name: 'SOMAX',
-    slogan: 'Força que vem da terra',
-    image: '/sponsors/somax.jpg', // troque pela arte real; se não existir, cai no placeholder
-    website: 'https://www.somax.com.py',
+    name: 'AGROTEC',
+    slogan: 'Fuerza que alimenta, pasión que construye',
+    image: '/sponsors/agrotec.jpg',
+    website: 'https://www.agrotec.com.py',
   },
 ];
 
@@ -50,7 +50,6 @@ export const GOLD_SPONSORS: TierSponsor[] = [
 export const SUPPORTER_SPONSORS: TierSponsor[] = [
   { name: 'GLYMAX' },
   { name: 'CIABAY' },
-  { name: 'AGROTEC' },
   { name: 'TECNOMYL' },
   { name: 'OVETRIL' },
   { name: 'ANDROPAR' },
