@@ -41,6 +41,7 @@ export default {
         sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
         display: ['"Archivo Black"', 'Archivo', 'sans-serif'],
         archivo: ['Archivo', 'sans-serif'],
+        serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
       },
       backgroundImage: {
         'gold-shine': 'linear-gradient(180deg,#8a5310 0%,#d99820 8%,#f6cf5a 18%,#fff3c4 28%,#e7b53a 42%,#a86b13 55%,#d99820 68%,#f4cb55 80%,#6f4310 100%)',

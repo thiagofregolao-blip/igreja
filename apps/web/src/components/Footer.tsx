@@ -1,27 +1,8 @@
-import { SponsorsRow } from './SponsorCard';
-
 export function Footer() {
   return (
-    <footer className="relative mt-24 bg-ink-900 text-white">
-      {/* AUSPICIANTES BANNER */}
-      <div className="relative pt-12 pb-10 px-6">
-        <div
-          className="absolute left-1/2 -translate-x-1/2 -top-6 px-8 py-3 rounded-full text-[12px] tracking-[.32em] font-extrabold text-ink-900"
-          style={{
-            background: 'linear-gradient(180deg,#f5cb4f 0%, #e3ae28 100%)',
-            boxShadow: '0 14px 26px -8px rgba(230,184,54,.55), inset 0 1px 0 rgba(255,255,255,.45)',
-          }}
-        >
-          AUSPICIANTES
-        </div>
-
-        <div className="max-w-[1300px] mx-auto mt-4">
-          <SponsorsRow size="sm" />
-        </div>
-      </div>
-
+    <footer className="relative bg-ink-900 text-white">
       {/* MAIN FOOTER COLUMNS */}
-      <div className="border-t border-white/5 py-12 px-6">
+      <div className="py-12 px-6">
         <div className="max-w-[1300px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1fr_1fr_auto] gap-10">
           {/* ORGANIZA */}
           <div>

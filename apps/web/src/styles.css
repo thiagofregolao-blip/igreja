@@ -194,3 +194,8 @@
 @media (prefers-reduced-motion: reduce) {
   .sponsors-marquee-track { animation: none; }
 }
+
+/* Banner da festa: tamanho natural no desktop, um pouco maior no mobile */
+@media (max-width: 860px) {
+  .hero-festa-img { width: 113%; max-width: none; margin-left: -6.5%; }
+}
