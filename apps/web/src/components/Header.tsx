@@ -39,7 +39,6 @@ export function Header() {
             {[
               [t('nav.home'), '/', true],
               [t('nav.prizes'), '/#prizes', false],
-              ['PATROCINADORES', '/#patrocinadores', false],
               [t('nav.howItWorks'), '/#how', false],
               [t('nav.buy'), '/events', false],
               ...(user ? [[t('nav.myTickets'), '/my-tickets', false] as [string, string, boolean]] : []),

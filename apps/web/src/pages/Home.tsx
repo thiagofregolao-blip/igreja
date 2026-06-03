@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { api } from '@/lib/api';
 import { formatLongDatePT, formatLongDateES, millionsLabel } from '@/lib/format';
 import { BilheteMaster } from '@/components/BilheteMaster';
-import { Sponsors } from '@/components/Sponsors';
 import { MASTER_SPONSORS } from '@/data/sponsors';
 import type { EventSummary } from '@catedral/types';
 
@@ -157,9 +156,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* ============ PATROCINADORES ============ */}
-      <Sponsors isEs={Boolean(isEs)} />
     </div>
   );
 }
