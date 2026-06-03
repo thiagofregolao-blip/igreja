@@ -4,19 +4,14 @@
 
 @layer base {
   html {
-    background: #f3efe6;
+    background: #ffffff;
   }
   body {
     margin: 0;
     color: #0d0f15;
     -webkit-font-smoothing: antialiased;
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-    background-color: #f3efe6;
-    background-image: url('/bg.png');
-    background-repeat: no-repeat;
-    background-position: center top;
-    background-size: 100% 100vh;
-    background-attachment: fixed;
+    background-color: #ffffff;
   }
   .font-display {
     font-family: 'Archivo Black', Archivo, sans-serif;
