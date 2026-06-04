@@ -3,6 +3,12 @@ import { MASTER_SPONSORS, GOLD_SPONSORS, SUPPORTER_SPONSORS, type TierSponsor } 
 
 const GOLD_SOFT = 'linear-gradient(180deg,#f3c84a,#d29a1f)';
 
+/** Co-patrocinadores que aparecem ao lado do AGROTEC (empilhados à direita). */
+const CO_SPONSORS = [
+  { name: 'SOMAX', image: '/sponsors/somax.jpg' },
+  { name: 'AGROFÉRTIL', image: '/sponsors/agrofertil.jpg' },
+];
+
 export function Sponsors({ isEs }: { isEs: boolean }) {
   const master = MASTER_SPONSORS[0];
   const logos = [...GOLD_SPONSORS, ...SUPPORTER_SPONSORS];
@@ -25,29 +31,49 @@ export function Sponsors({ isEs }: { isEs: boolean }) {
           : 'Empresas do agronegócio que apoiam a Capela Sagrado Coração de Jesus e a Festa do Bingo.'}
       </p>
 
-      {/* MASTER */}
-      {master && (
-        <div
-          className="max-w-[680px] mx-auto mt-9 rounded-[20px] overflow-hidden"
-          style={{
-            background: '#0c0e14',
-            border: '1px solid rgba(199,147,32,.4)',
-            boxShadow: '0 40px 80px -36px rgba(40,30,10,.4), 0 0 0 1px rgba(199,147,32,.12)',
-          }}
-        >
+      {/* MASTER + CO-PATROCINADORES */}
+      <div className="max-w-[1040px] mx-auto mt-9 grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-4 items-stretch">
+        {/* AGROTEC (master, grande) */}
+        {master && (
           <div
-            className="text-[11px] tracking-[.26em] uppercase font-heavy py-2.5"
-            style={{ background: 'linear-gradient(180deg,#1a1f2b,#0d1018)', color: '#e6b836' }}
+            className="rounded-[20px] overflow-hidden flex flex-col"
+            style={{
+              background: '#0c0e14',
+              border: '1px solid rgba(199,147,32,.4)',
+              boxShadow: '0 40px 80px -36px rgba(40,30,10,.4), 0 0 0 1px rgba(199,147,32,.12)',
+            }}
           >
-            ★ {isEs ? 'Patrocinador Oficial' : 'Patrocinador Oficial'}
+            <div
+              className="text-[11px] tracking-[.26em] uppercase font-heavy py-2.5"
+              style={{ background: 'linear-gradient(180deg,#1a1f2b,#0d1018)', color: '#e6b836' }}
+            >
+              ★ {isEs ? 'Patrocinador Oficial' : 'Patrocinador Oficial'}
+            </div>
+            {master.image ? (
+              <img src={master.image} alt={master.name} className="block w-full h-auto flex-1 object-cover" />
+            ) : (
+              <div className="py-10 font-display text-white text-3xl">{master.name}</div>
+            )}
           </div>
-          {master.image ? (
-            <img src={master.image} alt={master.name} className="block w-full h-auto" />
-          ) : (
-            <div className="py-10 font-display text-white text-3xl">{master.name}</div>
-          )}
+        )}
+
+        {/* SOMAX + AGROFÉRTIL (empilhados à direita) */}
+        <div className="flex flex-col gap-4">
+          {CO_SPONSORS.map((s) => (
+            <div
+              key={s.name}
+              className="flex-1 rounded-[18px] overflow-hidden magnetic"
+              style={{
+                background: '#0c0e14',
+                border: '1px solid rgba(199,147,32,.3)',
+                boxShadow: '0 24px 50px -30px rgba(40,30,10,.35), 0 0 0 1px rgba(199,147,32,.1)',
+              }}
+            >
+              <img src={s.image} alt={s.name} className="block w-full h-full object-cover" />
+            </div>
+          ))}
         </div>
-      )}
+      </div>
 
       {/* APOIADORES */}
       <div className="flex items-center gap-3 max-w-[900px] mx-auto mt-10 mb-4">
