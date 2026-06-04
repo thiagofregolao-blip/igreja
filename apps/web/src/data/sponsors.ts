@@ -34,30 +34,21 @@ export const MASTER_SPONSORS: MasterSponsor[] = [
   },
 ];
 
-/** Cota OURO — grade de logos em destaque. */
-export const GOLD_SPONSORS: TierSponsor[] = [
-  { name: 'AGRIDESA' },
-  { name: 'STARA' },
-  { name: 'JOHN DEERE KUROSU' },
-  { name: 'CORTEVA' },
-  { name: 'ADM' },
-  { name: 'C.VALE' },
-  { name: 'MATRISOJA' },
-  { name: 'TIMAC AGRO' },
-];
-
-/** APOIADORES — faixa rolando (marquee). */
-export const SUPPORTER_SPONSORS: TierSponsor[] = [
-  { name: 'GLYMAX' },
-  { name: 'CIABAY' },
-  { name: 'TECNOMYL' },
-  { name: 'OVETRIL' },
-  { name: 'ANDROPAR' },
-  { name: 'IASA' },
-  { name: 'DEKALPAR' },
-  { name: 'SANCOR SEGUROS' },
-  { name: 'RAINBOW' },
-  { name: 'COTRIPAR' },
-  { name: 'SIMBIOSE' },
-  { name: 'VACCARO' },
+/** APOIADORES — grade de logos (imagens reais). */
+export const APOIADORES: TierSponsor[] = [
+  { name: 'Agridesa', logo: '/sponsors/agridesa.jpg' },
+  { name: 'John Deere Kurosu & Cia', logo: '/sponsors/john-deere-kurosu.jpg' },
+  { name: 'Matrisoja', logo: '/sponsors/matrisoja.jpg' },
+  { name: 'Carga Granel S.A', logo: '/sponsors/carga-granel.jpg' },
+  { name: 'Prime S.A', logo: '/sponsors/prime.jpg' },
+  { name: 'Tafirel', logo: '/sponsors/tafirel.jpg' },
+  { name: 'IASA', logo: '/sponsors/iasa.jpg' },
+  { name: 'FIPYX', logo: '/sponsors/fipyx.jpg' },
+  { name: 'Seguros Impacto', logo: '/sponsors/impacto.jpg' },
+  { name: 'Básculas & Balanzas Colaco', logo: '/sponsors/colaco.jpg' },
+  { name: 'Repuestos Espinola', logo: '/sponsors/espinola.jpg' },
+  { name: 'Mapy', logo: '/sponsors/mapy.jpg' },
+  { name: 'Supermercado Emanuel', logo: '/sponsors/emanuel.jpg' },
+  { name: 'Rafaeli S.R.L', logo: '/sponsors/rafaeli.jpg' },
+  { name: 'Katueté Hotel', logo: '/sponsors/katuete-hotel.jpg' },
 ];

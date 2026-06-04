@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { MASTER_SPONSORS, GOLD_SPONSORS, SUPPORTER_SPONSORS, type TierSponsor } from '@/data/sponsors';
+import { MASTER_SPONSORS, APOIADORES, type TierSponsor } from '@/data/sponsors';
 
 const GOLD_SOFT = 'linear-gradient(180deg,#f3c84a,#d29a1f)';
 
@@ -11,7 +11,7 @@ const CO_SPONSORS = [
 
 export function Sponsors({ isEs }: { isEs: boolean }) {
   const master = MASTER_SPONSORS[0];
-  const logos = [...GOLD_SPONSORS, ...SUPPORTER_SPONSORS];
+  const logos = APOIADORES;
 
   return (
     <section
@@ -106,7 +106,7 @@ export function Sponsors({ isEs }: { isEs: boolean }) {
 function LogoTile({ sponsor }: { sponsor: TierSponsor }) {
   return (
     <div
-      className="h-[76px] rounded-[14px] flex items-center justify-center font-heavy text-center px-2 leading-tight magnetic"
+      className="h-[86px] rounded-[14px] flex items-center justify-center overflow-hidden font-heavy text-center px-2 leading-tight magnetic"
       style={{
         background: '#fff',
         border: '1px solid rgba(28,34,48,.1)',
@@ -116,7 +116,7 @@ function LogoTile({ sponsor }: { sponsor: TierSponsor }) {
       }}
     >
       {sponsor.logo ? (
-        <img src={sponsor.logo} alt={sponsor.name} className="max-h-[44px] max-w-full object-contain" />
+        <img src={sponsor.logo} alt={sponsor.name} className="max-h-[68px] max-w-[90%] object-contain" loading="lazy" />
       ) : (
         sponsor.name
       )}
