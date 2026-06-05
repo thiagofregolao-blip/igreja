@@ -49,6 +49,13 @@ export const env = {
   BANCARD_PUBLIC_KEY: optional('BANCARD_PUBLIC_KEY'),
   BANCARD_WEBHOOK_SECRET: optional('BANCARD_WEBHOOK_SECRET'),
 
+  // ===== Dinelco / Cybersource (cartão online) =====
+  // Pegue no portal da Dinelco/Bepsa: Merchant ID + REST API Key (key id + shared secret).
+  CYBS_RUN_ENV: optional('CYBS_RUN_ENV', 'sandbox'), // 'sandbox' ou 'production'
+  CYBS_MERCHANT_ID: optional('CYBS_MERCHANT_ID'),
+  CYBS_API_KEY_ID: optional('CYBS_API_KEY_ID'),
+  CYBS_SECRET_KEY: optional('CYBS_SECRET_KEY'),
+
   UPLOAD_DIR: optional('UPLOAD_DIR', './uploads'),
   MAX_UPLOAD_MB: int('MAX_UPLOAD_MB', 5),
 

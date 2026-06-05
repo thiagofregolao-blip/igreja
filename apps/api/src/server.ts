@@ -28,6 +28,7 @@ import cardsAdminRoutes from './modules/cards/cards.admin.routes.js';
 import couponsRoutes from './modules/coupons/coupons.routes.js';
 import ticketsRoutes from './modules/tickets/tickets.routes.js';
 import adminRoutes from './modules/admin/admin.routes.js';
+import dinelcoRoutes from './modules/payments/dinelco.routes.js';
 import bancardWebhookRoutes from './modules/webhooks/bancard.routes.js';
 
 const app = express();
@@ -68,6 +69,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/events', eventsPublicRoutes);
 app.use('/api/coupons', couponsRoutes);
 app.use('/api/tickets', ticketsRoutes);
+app.use('/api/payments/dinelco', dinelcoRoutes);
 app.use('/api/admin/events', eventsAdminRoutes);
 app.use('/api/admin', cardsAdminRoutes);
 app.use('/api/admin', adminRoutes);

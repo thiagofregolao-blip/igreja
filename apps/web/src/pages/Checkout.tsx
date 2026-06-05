@@ -5,6 +5,7 @@ import { api } from '@/lib/api';
 import { useCartStore } from '@/store/cart';
 import { useAuthStore } from '@/store/auth';
 import { formatGs } from '@/lib/format';
+import { DinelcoCard } from '@/components/DinelcoCard';
 
 export default function Checkout() {
   const { t } = useTranslation();
@@ -12,9 +13,11 @@ export default function Checkout() {
   const { eventId, sessionId, selectedCouponIds, clearCart } = useCartStore();
   const user = useAuthStore((s) => s.user);
   const [event, setEvent] = useState<any>(null);
-  const [method, setMethod] = useState<'BANK_TRANSFER' | 'BANCARD'>('BANK_TRANSFER');
-  const [step, setStep] = useState<'review' | 'upload' | 'done'>('review');
+  const [method, setMethod] = useState<'BANK_TRANSFER' | 'DINELCO'>('BANK_TRANSFER');
+  const [step, setStep] = useState<'review' | 'upload' | 'card' | 'done'>('review');
   const [ticket, setTicket] = useState<any>(null);
+  const [payment, setPayment] = useState<any>(null);
+  const [dinelcoEnabled, setDinelcoEnabled] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -23,6 +26,7 @@ export default function Checkout() {
     if (!user) nav('/login?redirect=/checkout');
     if (!eventId || selectedCouponIds.length === 0) { nav('/events'); return; }
     api.get(`/events/${eventId}`).then((r) => setEvent(r.data.event));
+    api.get('/payments/dinelco/status').then((r) => setDinelcoEnabled(Boolean(r.data?.enabled))).catch(() => {});
   }, [eventId, selectedCouponIds.length, user, nav]);
 
   if (!event) return <div className="text-center py-20 text-gold-700 animate-pulse">Carregando…</div>;
@@ -39,7 +43,8 @@ export default function Checkout() {
         paymentMethod: method,
       });
       setTicket(data.ticket);
-      setStep('upload');
+      setPayment(data.payment);
+      setStep(method === 'DINELCO' ? 'card' : 'upload');
     } catch (e: any) {
       setError(e.response?.data?.message ?? 'Erro ao criar pedido');
     } finally {
@@ -85,7 +90,7 @@ export default function Checkout() {
             <p className="text-muted text-xs uppercase tracking-widest font-bold mb-3">{t('checkout.method')}</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
               <MethodCard active={method === 'BANK_TRANSFER'} onClick={() => setMethod('BANK_TRANSFER')} title={t('checkout.bankTransfer')} subtitle="Aprovação manual" />
-              <MethodCard active={method === 'BANCARD'} onClick={() => setMethod('BANCARD')} title={t('checkout.bancard')} subtitle="Em breve" disabled />
+              <MethodCard active={method === 'DINELCO'} onClick={() => setMethod('DINELCO')} title="Cartão · Dinelco" subtitle={dinelcoEnabled ? 'Crédito / Débito' : 'Em configuração'} disabled={!dinelcoEnabled} />
             </div>
 
             {error && <p className="text-red-600 text-sm mb-3 font-semibold">{error}</p>}
@@ -127,6 +132,20 @@ export default function Checkout() {
             <button onClick={uploadReceipt} disabled={!file || loading} className="btn-gold w-full justify-center">
               {loading ? '...' : 'Enviar comprovante'}
             </button>
+          </>
+        )}
+
+        {step === 'card' && payment && (
+          <>
+            <div className="bg-emerald-50 border border-emerald-300 rounded-2xl p-4 mb-6">
+              <p className="text-emerald-800 font-extrabold">Bilhete #{ticket?.ticketNumber} reservado!</p>
+              <p className="text-emerald-700 text-sm mt-1">Finalize o pagamento com cartão para confirmar.</p>
+            </div>
+            <DinelcoCard
+              paymentId={payment.id}
+              amountLabel={formatGs(total)}
+              onSuccess={() => { clearCart(); setStep('done'); }}
+            />
           </>
         )}
 
