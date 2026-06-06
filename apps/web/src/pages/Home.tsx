@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { api } from '@/lib/api';
 import { Sponsors } from '@/components/Sponsors';
+import { HeroCarousel } from '@/components/HeroCarousel';
 import type { EventSummary } from '@catedral/types';
 
 const GOLD_SOFT = 'linear-gradient(180deg,#f3c84a,#d29a1f)';
@@ -29,10 +30,8 @@ export default function Home() {
 
   return (
     <div className="animate-fade-in">
-      {/* ============ HERO: BANNER DA FESTA ============ */}
-      <section className="relative overflow-hidden bg-white">
-        <img src="/festa-banner.jpg" alt="Fiesta de la Costilla" className="block w-full h-auto hero-festa-img" />
-      </section>
+      {/* ============ HERO: CARROSSEL DE BANNERS ============ */}
+      <HeroCarousel />
 
       {/* ============ COMPRAR + CONTADOR ============ */}
       <section

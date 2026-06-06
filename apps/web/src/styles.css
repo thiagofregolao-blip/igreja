@@ -190,7 +190,9 @@
   .sponsors-marquee-track { animation: none; }
 }
 
-/* Banner da festa: tamanho natural no desktop, bem maior no mobile */
+/* Carrossel do hero: proporção natural do banner no desktop (sem zoom),
+   um pouco mais alto no mobile (preenche melhor a tela). */
+.hero-carousel { aspect-ratio: 1920 / 819; }
 @media (max-width: 860px) {
-  .hero-festa-img { width: 140%; max-width: none; margin-left: -20%; }
+  .hero-carousel { aspect-ratio: 1920 / 1120; }
 }

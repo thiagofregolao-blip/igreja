@@ -62,6 +62,17 @@ export const uploadEventHero = multer({
   },
 }).single('hero');
 
+export const uploadBanner = multer({
+  storage: storageFor('banners'),
+  limits: { fileSize: 6 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (!IMAGE_MIMES.includes(file.mimetype)) {
+      return cb(BadRequest('Banner deve ser jpeg, png ou webp'));
+    }
+    cb(null, true);
+  },
+}).single('image');
+
 export const uploadCardImages = multer({
   storage: storageFor('cards'),
   limits: { fileSize: env.MAX_UPLOAD_MB * 1024 * 1024, files: 500 },

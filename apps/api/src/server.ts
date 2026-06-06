@@ -28,6 +28,8 @@ import cardsAdminRoutes from './modules/cards/cards.admin.routes.js';
 import couponsRoutes from './modules/coupons/coupons.routes.js';
 import ticketsRoutes from './modules/tickets/tickets.routes.js';
 import adminRoutes from './modules/admin/admin.routes.js';
+import bannersPublicRoutes from './modules/banners/banners.public.routes.js';
+import bannersAdminRoutes from './modules/banners/banners.admin.routes.js';
 import dinelcoRoutes from './modules/payments/dinelco.routes.js';
 import bancardWebhookRoutes from './modules/webhooks/bancard.routes.js';
 
@@ -67,10 +69,12 @@ app.get('/api/health', (_req, res) => res.json({ status: 'ok', time: new Date().
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventsPublicRoutes);
+app.use('/api/banners', bannersPublicRoutes);
 app.use('/api/coupons', couponsRoutes);
 app.use('/api/tickets', ticketsRoutes);
 app.use('/api/payments/dinelco', dinelcoRoutes);
 app.use('/api/admin/events', eventsAdminRoutes);
+app.use('/api/admin/banners', bannersAdminRoutes);
 app.use('/api/admin', cardsAdminRoutes);
 app.use('/api/admin', adminRoutes);
 
