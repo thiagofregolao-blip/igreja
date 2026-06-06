@@ -16,6 +16,7 @@ export function HeroCarousel() {
   const [banners, setBanners] = useState<Banner[]>(FALLBACK);
   const [idx, setIdx] = useState(0);
   const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth <= 860);
+  const [aspectMap, setAspectMap] = useState<Record<string, number>>({}); // id -> largura/altura da imagem exibida
   const touchX = useRef<number | null>(null);
 
   useEffect(() => {
@@ -52,13 +53,14 @@ export function HeroCarousel() {
     touchX.current = null;
   }
 
-  // No mobile com arte vertical, limitamos a ALTURA (deixa o botão Comprar visível na
-  // mesma tela) e usamos object-contain (mostra o banner inteiro, sem cortar).
+  // O container assume a proporção REAL da imagem exibida (medida ao carregar):
+  // preenche a largura inteira, sem corte e sem bordas laterais.
   const active = banners[idx];
   const activeUsesMobile = isMobile && Boolean(active?.mobileImageUrl);
-  const sectionStyle = activeUsesMobile
-    ? { height: 'min(66vh, 480px)' }
-    : { aspectRatio: '1920 / 819' };
+  const activeAspect = active ? aspectMap[active.id] : undefined;
+  const sectionStyle: React.CSSProperties = activeAspect
+    ? { aspectRatio: String(activeAspect) }
+    : { aspectRatio: activeUsesMobile ? '4 / 5' : '1920 / 819' };
 
   return (
     <section
@@ -74,7 +76,14 @@ export function HeroCarousel() {
           <img
             src={src}
             alt={b.title ?? 'Banner'}
-            className="absolute inset-0 w-full h-full object-contain transition-opacity duration-700"
+            onLoad={(e) => {
+              const im = e.currentTarget;
+              if (im.naturalWidth && im.naturalHeight) {
+                const ar = im.naturalWidth / im.naturalHeight;
+                setAspectMap((prev) => (prev[b.id] === ar ? prev : { ...prev, [b.id]: ar }));
+              }
+            }}
+            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
             style={{ opacity: i === idx ? 1 : 0 }}
             draggable={false}
           />
