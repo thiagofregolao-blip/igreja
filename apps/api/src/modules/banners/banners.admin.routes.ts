@@ -22,9 +22,13 @@ router.post(
   '/',
   uploadBanner,
   asyncHandler(async (req, res) => {
-    if (!req.file) return res.status(400).json({ error: 'BadRequest', message: 'Imagem obrigatória' });
+    const files = req.files as Record<string, Express.Multer.File[]> | undefined;
+    const desktop = files?.image?.[0];
+    const mobile = files?.imageMobile?.[0];
+    if (!desktop) return res.status(400).json({ error: 'BadRequest', message: 'Imagem (desktop) obrigatória' });
     const banner = await createBanner({
-      imageUrl: publicUrl(req.file.path),
+      imageUrl: publicUrl(desktop.path),
+      mobileImageUrl: mobile ? publicUrl(mobile.path) : undefined,
       title: req.body?.title,
       linkUrl: req.body?.linkUrl,
     });

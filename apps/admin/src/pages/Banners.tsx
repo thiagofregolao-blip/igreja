@@ -16,10 +16,12 @@ export default function Banners() {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [fileMobile, setFileMobile] = useState<File | null>(null);
   const [title, setTitle] = useState('');
   const [linkUrl, setLinkUrl] = useState('');
   const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const fileMobileRef = useRef<HTMLInputElement>(null);
 
   async function load() {
     const { data } = await api.get('/admin/banners');
@@ -33,11 +35,13 @@ export default function Banners() {
     try {
       const fd = new FormData();
       fd.append('image', file);
+      if (fileMobile) fd.append('imageMobile', fileMobile);
       if (title) fd.append('title', title);
       if (linkUrl) fd.append('linkUrl', linkUrl);
       await api.post('/admin/banners', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-      setFile(null); setTitle(''); setLinkUrl('');
+      setFile(null); setFileMobile(null); setTitle(''); setLinkUrl('');
       if (fileRef.current) fileRef.current.value = '';
+      if (fileMobileRef.current) fileMobileRef.current.value = '';
       await load();
     } catch (e: any) {
       setError(e?.response?.data?.message ?? 'Erro ao enviar banner');
@@ -72,10 +76,14 @@ export default function Banners() {
         <p className="text-gold font-bold text-sm mb-3">Adicionar banner</p>
         <div className="grid md:grid-cols-[1fr_1fr_auto] gap-3 items-end">
           <div>
-            <label className="block text-[11px] text-white/50 uppercase tracking-wider mb-1.5">Imagem (ideal 1920×819)</label>
+            <label className="block text-[11px] text-white/50 uppercase tracking-wider mb-1.5">Imagem desktop (ideal 1920×819)</label>
             <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp"
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
               className="text-sm text-white/80 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-gold file:text-ink-900 file:font-bold" />
+            <label className="block text-[11px] text-white/50 uppercase tracking-wider mb-1.5 mt-3">Imagem mobile (opcional · ideal 1080×1350)</label>
+            <input ref={fileMobileRef} type="file" accept="image/jpeg,image/png,image/webp"
+              onChange={(e) => setFileMobile(e.target.files?.[0] ?? null)}
+              className="text-sm text-white/80 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-white/10 file:text-white file:font-bold" />
           </div>
           <div>
             <label className="block text-[11px] text-white/50 uppercase tracking-wider mb-1.5">Link (opcional)</label>

@@ -4,6 +4,7 @@ import { api } from '@/lib/api';
 interface Banner {
   id: string;
   imageUrl: string;
+  mobileImageUrl?: string | null;
   title?: string | null;
   linkUrl?: string | null;
 }
@@ -14,6 +15,7 @@ const FALLBACK: Banner[] = [{ id: 'fallback', imageUrl: '/festa-banner.jpg', tit
 export function HeroCarousel() {
   const [banners, setBanners] = useState<Banner[]>(FALLBACK);
   const [idx, setIdx] = useState(0);
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth <= 860);
   const touchX = useRef<number | null>(null);
 
   useEffect(() => {
@@ -26,9 +28,14 @@ export function HeroCarousel() {
       .catch(() => {});
   }, []);
 
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 860);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
   const count = banners.length;
 
-  // rotação automática (pausa se só houver 1)
   useEffect(() => {
     if (count <= 1) return;
     const t = setInterval(() => setIdx((i) => (i + 1) % count), 6000);
@@ -45,18 +52,26 @@ export function HeroCarousel() {
     touchX.current = null;
   }
 
+  // No mobile, se o banner ativo tiver arte mobile, o hero fica vertical (4:5) e grande.
+  const active = banners[idx];
+  const activeUsesMobile = isMobile && Boolean(active?.mobileImageUrl);
+  const aspect = activeUsesMobile ? '4 / 5' : '1920 / 819';
+
   return (
     <section
-      className="relative w-full overflow-hidden bg-white select-none hero-carousel"
+      className="relative w-full overflow-hidden bg-white select-none transition-[aspect-ratio] duration-300"
+      style={{ aspectRatio: aspect }}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
       {banners.map((b, i) => {
+        const useMobile = isMobile && Boolean(b.mobileImageUrl);
+        const src = useMobile ? (b.mobileImageUrl as string) : b.imageUrl;
         const img = (
           <img
-            src={b.imageUrl}
+            src={src}
             alt={b.title ?? 'Banner'}
-            className="absolute inset-0 w-full h-full object-contain transition-opacity duration-700"
+            className={`absolute inset-0 w-full h-full transition-opacity duration-700 ${useMobile ? 'object-cover' : 'object-contain'}`}
             style={{ opacity: i === idx ? 1 : 0 }}
             draggable={false}
           />
@@ -72,7 +87,6 @@ export function HeroCarousel() {
 
       {count > 1 && (
         <>
-          {/* setas */}
           <button
             aria-label="Anterior"
             onClick={() => go(idx - 1)}
@@ -90,7 +104,6 @@ export function HeroCarousel() {
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 6l6 6-6 6" /></svg>
           </button>
 
-          {/* bolinhas */}
           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex gap-2">
             {banners.map((_, i) => (
               <button

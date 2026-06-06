@@ -71,7 +71,10 @@ export const uploadBanner = multer({
     }
     cb(null, true);
   },
-}).single('image');
+}).fields([
+  { name: 'image', maxCount: 1 },
+  { name: 'imageMobile', maxCount: 1 },
+]);
 
 export const uploadCardImages = multer({
   storage: storageFor('cards'),
