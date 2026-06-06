@@ -94,7 +94,7 @@ function BannerEditor({ banner, onClose, onSaved }: { banner: Banner | null; onC
     setError(null); setBusy(true);
     try {
       if (isNew) {
-        if (!webFile) { setTab('web'); setError('Envie a imagem Web (obrigatória).'); setBusy(false); return; }
+        if (!webFile) { setError('⚠️ A imagem Web é obrigatória — adicione na aba 🖥️ Web.'); setBusy(false); return; }
         const fd = new FormData();
         fd.append('image', webFile);
         if (mobileFile) fd.append('imageMobile', mobileFile);
@@ -126,10 +126,15 @@ function BannerEditor({ banner, onClose, onSaved }: { banner: Banner | null; onC
         </div>
 
         {/* Abas */}
-        <div className="flex gap-2 mb-4">
-          <button onClick={() => setTab('web')} className={`flex-1 py-2 rounded-lg text-sm font-bold transition ${tab === 'web' ? 'bg-gold text-ink-900' : 'bg-white/5 text-white/60'}`}>🖥️ Web</button>
-          <button onClick={() => setTab('mobile')} className={`flex-1 py-2 rounded-lg text-sm font-bold transition ${tab === 'mobile' ? 'bg-gold text-ink-900' : 'bg-white/5 text-white/60'}`}>📱 Mobile</button>
+        <div className="flex gap-2 mb-2">
+          <button onClick={() => setTab('web')} className={`flex-1 py-2 rounded-lg text-sm font-bold transition flex items-center justify-center gap-2 ${tab === 'web' ? 'bg-gold text-ink-900' : 'bg-white/5 text-white/60'}`}>
+            🖥️ Web <span className="w-2 h-2 rounded-full" style={{ background: webPreview ? '#22c55e' : '#71717a' }} />
+          </button>
+          <button onClick={() => setTab('mobile')} className={`flex-1 py-2 rounded-lg text-sm font-bold transition flex items-center justify-center gap-2 ${tab === 'mobile' ? 'bg-gold text-ink-900' : 'bg-white/5 text-white/60'}`}>
+            📱 Mobile <span className="w-2 h-2 rounded-full" style={{ background: mobilePreview ? '#22c55e' : '#71717a' }} />
+          </button>
         </div>
+        <p className="text-white/40 text-[11px] mb-4">Web é obrigatória · Mobile é opcional. O ponto fica verde quando a imagem está definida.</p>
 
         {tab === 'web' && (
           <Slot
