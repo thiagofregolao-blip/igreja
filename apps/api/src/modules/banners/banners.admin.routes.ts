@@ -36,6 +36,23 @@ router.post(
   }),
 );
 
+/** Troca/adiciona a imagem web e/ou mobile de um banner existente. */
+router.post(
+  '/:id/image',
+  uploadBanner,
+  asyncHandler(async (req, res) => {
+    const files = req.files as Record<string, Express.Multer.File[]> | undefined;
+    const desktop = files?.image?.[0];
+    const mobile = files?.imageMobile?.[0];
+    if (!desktop && !mobile) return res.status(400).json({ error: 'BadRequest', message: 'Envie ao menos uma imagem' });
+    const data: { imageUrl?: string; mobileImageUrl?: string } = {};
+    if (desktop) data.imageUrl = publicUrl(desktop.path);
+    if (mobile) data.mobileImageUrl = publicUrl(mobile.path);
+    const banner = await updateBanner(req.params.id, data);
+    res.json({ banner });
+  }),
+);
+
 const updateSchema = z.object({
   title: z.string().max(120).optional(),
   linkUrl: z.string().max(500).optional().or(z.literal('')),

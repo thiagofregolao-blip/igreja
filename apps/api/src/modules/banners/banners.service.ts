@@ -29,7 +29,7 @@ export async function createBanner(data: { imageUrl: string; mobileImageUrl?: st
 
 export async function updateBanner(
   id: string,
-  data: { title?: string; linkUrl?: string; isActive?: boolean; order?: number },
+  data: { title?: string; linkUrl?: string; isActive?: boolean; order?: number; imageUrl?: string; mobileImageUrl?: string },
 ) {
   const exists = await prisma.banner.findUnique({ where: { id } });
   if (!exists) throw NotFound('Banner não encontrado');
