@@ -190,9 +190,6 @@
   .sponsors-marquee-track { animation: none; }
 }
 
-/* Carrossel do hero: proporção natural do banner no desktop (sem zoom),
-   um pouco mais alto no mobile (preenche melhor a tela). */
+/* Carrossel do hero: proporção natural do banner (2.34:1) em todas as telas,
+   exibindo a imagem inteira (sem corte). */
 .hero-carousel { aspect-ratio: 1920 / 819; }
-@media (max-width: 860px) {
-  .hero-carousel { aspect-ratio: 1920 / 1120; }
-}
