@@ -52,15 +52,18 @@ export function HeroCarousel() {
     touchX.current = null;
   }
 
-  // No mobile, se o banner ativo tiver arte mobile, o hero fica vertical (4:5) e grande.
+  // No mobile com arte vertical, limitamos a ALTURA (deixa o botão Comprar visível na
+  // mesma tela) e usamos object-contain (mostra o banner inteiro, sem cortar).
   const active = banners[idx];
   const activeUsesMobile = isMobile && Boolean(active?.mobileImageUrl);
-  const aspect = activeUsesMobile ? '4 / 5' : '1920 / 819';
+  const sectionStyle = activeUsesMobile
+    ? { height: 'min(66vh, 480px)' }
+    : { aspectRatio: '1920 / 819' };
 
   return (
     <section
-      className="relative w-full overflow-hidden bg-white select-none transition-[aspect-ratio] duration-300"
-      style={{ aspectRatio: aspect }}
+      className="relative w-full overflow-hidden bg-white select-none"
+      style={sectionStyle}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
@@ -71,7 +74,7 @@ export function HeroCarousel() {
           <img
             src={src}
             alt={b.title ?? 'Banner'}
-            className={`absolute inset-0 w-full h-full transition-opacity duration-700 ${useMobile ? 'object-cover' : 'object-contain'}`}
+            className="absolute inset-0 w-full h-full object-contain transition-opacity duration-700"
             style={{ opacity: i === idx ? 1 : 0 }}
             draggable={false}
           />
