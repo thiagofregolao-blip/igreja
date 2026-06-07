@@ -18,6 +18,7 @@ export function Layout() {
             ['Dashboard', '/'],
             ['Eventos', '/events'],
             ['Banners', '/banners'],
+            ['WebRádio', '/radio'],
             ['Pagamentos', '/payments'],
             ['Bilhetes', '/tickets'],
             ['Clientes', '/users'],

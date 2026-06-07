@@ -20,6 +20,7 @@ export function Header() {
     ['PATROCINADORES', '/#patrocinadores', false],
     [t('nav.howItWorks'), '/#how', false],
     [t('nav.buy'), '/events', false],
+    [t('nav.radio'), '/radio', false],
     ...(user ? [[t('nav.myTickets'), '/my-tickets', false] as [string, string, boolean]] : []),
   ];
 

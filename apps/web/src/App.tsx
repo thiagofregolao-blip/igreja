@@ -8,6 +8,7 @@ import Register from '@/pages/Register';
 import Checkout from '@/pages/Checkout';
 import MyTickets from '@/pages/MyTickets';
 import Account from '@/pages/Account';
+import Radio from '@/pages/Radio';
 import { useAuthStore } from '@/store/auth';
 
 function Protected({ children }: { children: React.ReactNode }) {
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/events" element={<Events />} />
         <Route path="/events/:id" element={<EventDetail />} />
+        <Route path="/radio" element={<Radio />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/checkout" element={<Protected><Checkout /></Protected>} />

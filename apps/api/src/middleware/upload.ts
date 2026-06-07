@@ -76,6 +76,17 @@ export const uploadBanner = multer({
   { name: 'imageMobile', maxCount: 1 },
 ]);
 
+export const uploadRadioCover = multer({
+  storage: storageFor('radio'),
+  limits: { fileSize: 3 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (!IMAGE_MIMES.includes(file.mimetype)) {
+      return cb(BadRequest('Capa deve ser jpeg, png ou webp'));
+    }
+    cb(null, true);
+  },
+}).single('cover');
+
 export const uploadCardImages = multer({
   storage: storageFor('cards'),
   limits: { fileSize: env.MAX_UPLOAD_MB * 1024 * 1024, files: 500 },

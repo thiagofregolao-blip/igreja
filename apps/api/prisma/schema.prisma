@@ -105,6 +105,17 @@ model Banner {
   @@index([isActive, order])
 }
 
+model RadioConfig {
+  id            String   @id @default(uuid())
+  streamUrl     String?
+  nowPlayingUrl String?
+  stationName   String?
+  coverImageUrl String?
+  isEnabled     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
 model Sponsor {
   id         String   @id @default(uuid())
   eventId    String
