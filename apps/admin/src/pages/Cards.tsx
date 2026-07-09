@@ -10,6 +10,8 @@ interface CardsStats {
   totalCards: number;
   expectedCards: number;
   byStatus: Record<string, number>;
+  availableForSale: number;
+  blocked: number;
 }
 
 interface ImportFileResult {
@@ -34,6 +36,10 @@ export default function Cards() {
   const [progress, setProgress] = useState({ done: 0, total: 0 });
   const [report, setReport] = useState<{ imported: number; skipped: number; failed: number; errors: ImportFileResult[] } | null>(null);
 
+  const [availableInput, setAvailableInput] = useState('');
+  const [savingAvail, setSavingAvail] = useState(false);
+  const [availMsg, setAvailMsg] = useState<string | null>(null);
+
   useEffect(() => {
     api.get('/admin/events').then(({ data }) => {
       const evs = data.events ?? [];
@@ -54,7 +60,27 @@ export default function Cards() {
     try {
       const { data } = await api.get(`/admin/events/${eventId}/cards/stats`);
       setStats(data.stats);
+      // sincroniza o input com o valor atual (livres+liberados)
+      const onSale = (data.stats.availableForSale ?? 0);
+      const blocked = (data.stats.blocked ?? 0);
+      setAvailableInput(String(onSale + blocked > 0 ? onSale : onSale));
     } catch { setStats(null); }
+  }
+
+  async function saveAvailability() {
+    const n = parseInt(availableInput, 10);
+    if (isNaN(n) || n < 0) { setAvailMsg('Informe um número válido'); return; }
+    setSavingAvail(true);
+    setAvailMsg(null);
+    try {
+      const { data } = await api.put(`/admin/events/${eventId}/cards/availability`, { available: n });
+      setAvailMsg(`✓ ${data.summary.availableForSale} disponíveis · ${data.summary.blocked} bloqueadas`);
+      loadStats();
+    } catch (e: any) {
+      setAvailMsg(e?.response?.data?.message ?? 'Erro ao aplicar');
+    } finally {
+      setSavingAvail(false);
+    }
   }
 
   const validPdfs = useMemo(
@@ -125,9 +151,45 @@ export default function Cards() {
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           <Stat label="Cupons com PDF" value={stats.couponsWithPdf} sub={`de ${stats.maxCoupons}`} highlight />
+          <Stat label="Disponíveis p/ venda" value={stats.availableForSale} sub={`${stats.blocked} bloqueadas`} />
+          <Stat label="Vendidos (real)" value={stats.byStatus.SOLD ?? 0} sub={`${stats.byStatus.RESERVED ?? 0} reservados`} />
           <Stat label="Faltam importar" value={stats.couponsWithoutPdf} sub="sem PDF" warn={stats.couponsWithoutPdf > 0} />
-          <Stat label="Cartelas (imagens)" value={stats.totalCards} sub={`esperado ${stats.expectedCards}`} />
-          <Stat label="Vendidos" value={stats.byStatus.SOLD ?? 0} sub={`${stats.byStatus.AVAILABLE ?? 0} disponíveis`} />
+        </div>
+      )}
+
+      {/* Controle de venda / senso de urgência */}
+      {stats && (
+        <div className="card p-6 mb-6">
+          <h2 className="font-bold text-lg mb-1">Controle de venda</h2>
+          <p className="text-white/50 text-sm mb-4">
+            Defina quantas cartelas ficam <b className="text-white/80">disponíveis</b> para o público agora.
+            As demais ficam <b className="text-white/80">bloqueadas</b> e aparecem como <b className="text-white/80">vendidas</b> na grade
+            (escolhidas aleatoriamente, para simular vendas espalhadas). Vendas e reservas reais não são afetadas.
+          </p>
+          <div className="flex flex-wrap items-end gap-3">
+            <div>
+              <label className="block text-xs text-white/50 uppercase tracking-widest font-bold mb-1.5">Disponíveis para venda</label>
+              <input
+                type="number" min={0} max={stats.availableForSale + stats.blocked}
+                value={availableInput} onChange={(e) => setAvailableInput(e.target.value)}
+                className="input w-40"
+              />
+            </div>
+            <button onClick={saveAvailability} disabled={savingAvail} className="btn-gold disabled:opacity-40">
+              {savingAvail ? 'Aplicando…' : 'Aplicar'}
+            </button>
+            <div className="flex gap-1.5">
+              {[200, 400, 600].map((n) => (
+                <button key={n} onClick={() => setAvailableInput(String(n))}
+                        className="btn-ghost text-xs px-3 py-1.5">{n}</button>
+              ))}
+            </div>
+          </div>
+          <p className="text-white/40 text-xs mt-3">
+            Total de cartelas livres: {stats.availableForSale + stats.blocked} (bloqueadas + disponíveis).
+            Conforme forem vendidas de verdade, aumente este número para liberar mais.
+          </p>
+          {availMsg && <p className="text-sm mt-3 text-gold font-semibold">{availMsg}</p>}
         </div>
       )}
 

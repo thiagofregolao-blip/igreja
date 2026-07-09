@@ -1,10 +1,13 @@
 import fs from 'node:fs';
 import { Router } from 'express';
+import { z } from 'zod';
 import { asyncHandler } from '../../middleware/asyncHandler.js';
 import { authRequired, requireAdmin } from '../../middleware/auth.js';
+import { validate } from '../../middleware/validate.js';
 import { uploadBingoPdfs, uploadCardImages, uploadCsv } from '../../middleware/upload.js';
 import { getEventCardsStats, importCardNumbersCsv, listEventCards, uploadCards } from './cards.service.js';
 import { importBingoPdfs } from './bingoPdf.service.js';
+import { setCouponAvailability } from '../coupons/coupons.service.js';
 
 const router = Router();
 router.use(authRequired, requireAdmin);
@@ -14,6 +17,18 @@ router.get(
   asyncHandler(async (req, res) => {
     const stats = await getEventCardsStats(req.params.id);
     res.json({ stats });
+  }),
+);
+
+// Controle de vitrine: define quantos cupons ficam disponíveis para venda.
+// Os demais (livres) ficam bloqueados e aparecem como vendidos ao público.
+const availabilitySchema = z.object({ available: z.number().int().min(0) });
+router.put(
+  '/events/:id/cards/availability',
+  validate(availabilitySchema),
+  asyncHandler(async (req, res) => {
+    const summary = await setCouponAvailability(req.params.id, req.body.available);
+    res.json({ summary });
   }),
 );
 

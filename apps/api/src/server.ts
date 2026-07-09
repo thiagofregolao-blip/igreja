@@ -38,6 +38,11 @@ import bancardWebhookRoutes from './modules/webhooks/bancard.routes.js';
 const app = express();
 const server = http.createServer(app);
 
+// Atrás de proxy (Railway): confia no primeiro hop para que req.ip/req.protocol
+// venham do X-Forwarded-For/Proto. Sem isso o express-rate-limit erra
+// (ERR_ERL_UNEXPECTED_X_FORWARDED_FOR) e agrupa todos os usuários no IP do proxy.
+app.set('trust proxy', 1);
+
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: 'cross-origin' },

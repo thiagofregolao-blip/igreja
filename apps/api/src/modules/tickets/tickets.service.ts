@@ -20,6 +20,7 @@ export async function createTicketFromCheckout(input: CheckoutInput, userId: str
   // Validar que pertencem ao evento + status compatível com checkout
   for (const c of coupons) {
     if (c.eventId !== input.eventId) throw BadRequest('Cupom não pertence ao evento');
+    if (c.locked) throw Conflict(`Cartela ${c.couponNumber} não está disponível`);
     if (c.status === 'SOLD') throw Conflict(`Cupom ${c.couponNumber} já vendido`);
     if (c.status === 'PENDING') throw Conflict(`Cupom ${c.couponNumber} em outro processo de pagamento`);
     if (c.status === 'RESERVED' && c.reservedSessionId !== input.sessionId) {
@@ -52,6 +53,7 @@ export async function createTicketFromCheckout(input: CheckoutInput, userId: str
       where: {
         id: { in: input.couponIds },
         eventId: input.eventId,
+        locked: false,
         OR: [
           { status: 'AVAILABLE' },
           { status: 'RESERVED', reservedSessionId: input.sessionId },

@@ -60,18 +60,24 @@ export interface CheckoutSession {
   expirationDate?: string;
 }
 
-export async function createCheckoutSession(input: CreateSessionInput): Promise<CheckoutSession> {
+/**
+ * @param origin origem real da requisição (ex.: https://catedralkatuete.com.py),
+ *        derivada do request em produção — a Bepsa valida o targetOrigin contra o
+ *        domínio que embute o iframe. Fallback: env.FRONTEND_URL.
+ */
+export async function createCheckoutSession(input: CreateSessionInput, origin?: string): Promise<CheckoutSession> {
+  const targetOrigin = origin || env.FRONTEND_URL;
   const body: Record<string, unknown> = {
     amount: input.amount,
     currency: 'PYG',
-    targetOrigin: env.FRONTEND_URL,
+    targetOrigin,
     clientReferenceId: input.clientReferenceId,
     customer: input.customer,
     metadata: input.metadata,
   };
-  // callbackUrl não aceita localhost — só envia em produção
-  if (env.API_URL.startsWith('https://')) {
-    body.callbackUrl = `${env.API_URL.replace(/\/$/, '')}/api/payments/dinelco/callback`;
+  // callbackUrl não aceita localhost — só envia quando a origem é https (produção)
+  if (targetOrigin.startsWith('https://')) {
+    body.callbackUrl = `${targetOrigin.replace(/\/$/, '')}/api/payments/dinelco/callback`;
   }
   return dinelcoRequest<CheckoutSession>('POST', '/dinelco-checkout/api/v1/checkout-session', body);
 }

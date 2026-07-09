@@ -17,3 +17,8 @@ export function emitCouponUpdate(eventId: string, payload: unknown) {
 export function emitEventUpdate(eventId: string, payload: unknown) {
   io?.to(`event:${eventId}`).emit('event:update', payload);
 }
+
+/** Pede aos clientes conectados que recarreguem a lista de cupons (mudança em massa). */
+export function emitCouponsRefresh(eventId: string) {
+  io?.to(`event:${eventId}`).emit('coupon:update', { refresh: true, eventId });
+}

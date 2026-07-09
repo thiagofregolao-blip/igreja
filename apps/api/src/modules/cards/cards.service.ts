@@ -135,6 +135,11 @@ export async function getEventCardsStats(eventId: string) {
   for (const g of statusGroups) byStatus[g.status] = g._count;
   const totalCoupons = Object.values(byStatus).reduce((a, b) => a + b, 0);
 
+  const [blocked, availableForSale] = await Promise.all([
+    prisma.coupon.count({ where: { eventId, status: 'AVAILABLE', locked: true } }),
+    prisma.coupon.count({ where: { eventId, status: 'AVAILABLE', locked: false } }),
+  ]);
+
   return {
     maxCoupons: event.maxCoupons,
     cardsPerCoupon: event.cardsPerCoupon,
@@ -144,6 +149,8 @@ export async function getEventCardsStats(eventId: string) {
     totalCards,           // cartelas (imagens) importadas
     expectedCards: totalCoupons * event.cardsPerCoupon,
     byStatus,
+    availableForSale,     // cupons livres e liberados (visíveis para compra)
+    blocked,              // cupons livres porém bloqueados (aparecem como vendidos)
   };
 }
 

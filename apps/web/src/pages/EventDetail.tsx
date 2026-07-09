@@ -72,23 +72,32 @@ export default function EventDetail() {
     if (!id) return;
     setEvent(id);
     let mounted = true;
+    const applyCoupons = (list: CouponPublic[]) => {
+      if (!mounted) return;
+      setCoupons(list);
+      // O carrinho local só vale se o servidor confirmar a reserva desta sessão —
+      // remove IDs antigos (reserva expirada, vendida ou de outra pessoa)
+      const st = useCartStore.getState();
+      const valid = list
+        .filter((c) => c.status === 'RESERVED' && c.reservedBy === st.sessionId)
+        .map((c) => c.id);
+      st.pruneCart(valid);
+    };
+    const refetchCoupons = () => {
+      api.get(`/coupons/events/${id}/coupons`).then((cp) => applyCoupons(cp.data.coupons)).catch(() => {});
+    };
     Promise.all([
       api.get(`/events/${id}`),
       api.get(`/coupons/events/${id}/coupons`),
     ]).then(([ev, cp]) => {
       if (!mounted) return;
       setEvt(ev.data.event);
-      setCoupons(cp.data.coupons);
-      // O carrinho local só vale se o servidor confirmar a reserva desta sessão —
-      // remove IDs antigos (reserva expirada, vendida ou de outra pessoa)
-      const st = useCartStore.getState();
-      const valid = (cp.data.coupons as CouponPublic[])
-        .filter((c) => c.status === 'RESERVED' && c.reservedBy === st.sessionId)
-        .map((c) => c.id);
-      st.pruneCart(valid);
+      applyCoupons(cp.data.coupons);
       setLoading(false);
     });
-    const unsub = subscribeToEvent(id, (payload: { couponId: string; status: any; reservedBy?: string }) => {
+    const unsub = subscribeToEvent(id, (payload: { couponId: string; status: any; reservedBy?: string; refresh?: boolean }) => {
+      // Mudança em massa (admin liberou/bloqueou cartelas) → recarrega a grade
+      if (payload.refresh) { refetchCoupons(); return; }
       setCoupons((cur) =>
         cur.map((c) =>
           c.id === payload.couponId

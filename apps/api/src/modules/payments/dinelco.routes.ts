@@ -93,6 +93,9 @@ router.post(
     }
 
     const [firstName, ...rest] = payment.user.name.split(' ');
+    // Origem real (domínio + protocolo) — a Bepsa valida o targetOrigin do iframe.
+    // Depende de app.set('trust proxy') para req.protocol vir como https em produção.
+    const origin = `${req.protocol}://${req.get('host')}`;
     const session = await createCheckoutSession({
       amount: payment.amount,
       clientReferenceId: payment.id,
@@ -104,7 +107,7 @@ router.post(
         phone: payment.user.phone,
       },
       metadata: { ticketId: payment.ticketId, ticketNumber: String(payment.ticket.ticketNumber) },
-    });
+    }, origin);
 
     // Guarda o sessionId para a confirmação posterior
     await prisma.payment.update({

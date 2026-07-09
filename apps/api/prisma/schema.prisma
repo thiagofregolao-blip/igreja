@@ -156,6 +156,9 @@ model Coupon {
   reservedBy   String?
   reservedSessionId String?
   pdfUrl       String?
+  // Bloqueio de vitrine: cupom livre porém não exibido/vendável (aparece como "vendido"
+  // para o público). Usado para liberar as cartelas aos poucos e criar senso de urgência.
+  locked       Boolean      @default(false)
   ticketId     String?
   ticket       Ticket?      @relation(fields: [ticketId], references: [id])
   cards        Card[]
@@ -164,6 +167,7 @@ model Coupon {
 
   @@unique([eventId, couponNumber])
   @@index([eventId, status])
+  @@index([eventId, locked])
   @@index([ticketId])
 }
 
