@@ -24,10 +24,12 @@ export function DinelcoCard({
 }) {
   const [error, setError] = useState<string | null>(null);
   const [phase, setPhase] = useState<'init' | 'ready' | 'confirming'>('init');
+  const [slowHint, setSlowHint] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const tokenRef = useRef<HTMLInputElement>(null);
   const formOriginRef = useRef<string>('');
   const confirmingRef = useRef(false);
+  const slowTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   async function confirm() {
     if (confirmingRef.current) return;
@@ -63,6 +65,9 @@ export function DinelcoCard({
           tokenRef.current.value = data.integrityToken;
           formRef.current.submit();
           setPhase('ready');
+          // Se o iframe do checkout não "conversar" em ~18s (host fora do ar/
+          // bloqueado/conexão recusada), mostra um aviso amigável.
+          slowTimerRef.current = setTimeout(() => setSlowHint(true), 18000);
         }
       } catch (e: any) {
         setError(
@@ -76,12 +81,19 @@ export function DinelcoCard({
     const onMessage = (ev: MessageEvent) => {
       // aceita eventos apenas do domínio do checkout da Dinelco
       if (!formOriginRef.current || ev.origin !== formOriginRef.current) return;
+      // O iframe respondeu → cancela o aviso de "demorando"
+      if (slowTimerRef.current) { clearTimeout(slowTimerRef.current); slowTimerRef.current = null; }
+      setSlowHint(false);
       const status = (ev.data && (ev.data.paymentStatus ?? ev.data.status)) as string | undefined;
       if (status === 'payment.success') void confirm();
       else if (status === 'payment.failed') setError('Pagamento recusado pelo cartão. Verifique os dados e tente novamente.');
     };
     window.addEventListener('message', onMessage);
-    return () => { cancelled = true; window.removeEventListener('message', onMessage); };
+    return () => {
+      cancelled = true;
+      window.removeEventListener('message', onMessage);
+      if (slowTimerRef.current) clearTimeout(slowTimerRef.current);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paymentId]);
 
@@ -108,6 +120,13 @@ export function DinelcoCard({
 
       {phase === 'confirming' && (
         <p className="text-gold-700 text-sm mb-3 font-semibold text-center animate-pulse">Confirmando pagamento…</p>
+      )}
+      {slowHint && phase !== 'confirming' && (
+        <div className="rounded-xl p-3 mb-3 text-sm text-amber-900 text-center"
+             style={{ background: 'rgba(230,184,54,.12)', border: '1px solid rgba(230,184,54,.4)' }}>
+          O pagamento está demorando para carregar. Se aparecer um erro de conexão,
+          verifique sua internet e tente novamente em instantes — sua reserva continua válida.
+        </div>
       )}
       {error && <p className="text-red-600 text-sm mb-3 font-semibold text-center">{error}</p>}
 
