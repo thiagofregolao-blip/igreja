@@ -10,6 +10,8 @@ import MyTickets from '@/pages/MyTickets';
 import Account from '@/pages/Account';
 import Radio from '@/pages/Radio';
 import Help from '@/pages/Help';
+import SalesClosed from '@/pages/SalesClosed';
+import { SALES_ENABLED } from '@/config';
 import { useAuthStore } from '@/store/auth';
 
 function Protected({ children }: { children: React.ReactNode }) {
@@ -28,13 +30,13 @@ export default function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
-        <Route path="/events" element={<Events />} />
-        <Route path="/events/:id" element={<EventDetail />} />
+        <Route path="/events" element={SALES_ENABLED ? <Events /> : <SalesClosed />} />
+        <Route path="/events/:id" element={SALES_ENABLED ? <EventDetail /> : <SalesClosed />} />
         <Route path="/radio" element={<Radio />} />
         <Route path="/ajuda" element={<Help />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/checkout" element={<Protected><Checkout /></Protected>} />
+        <Route path="/checkout" element={SALES_ENABLED ? <Protected><Checkout /></Protected> : <SalesClosed />} />
         <Route path="/my-tickets" element={<Protected><MyTickets /></Protected>} />
         <Route path="/account" element={<Protected><Account /></Protected>} />
         <Route path="*" element={<Navigate to="/" replace />} />

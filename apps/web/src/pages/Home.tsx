@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { api } from '@/lib/api';
 import { Sponsors } from '@/components/Sponsors';
 import { HeroCarousel } from '@/components/HeroCarousel';
+import { SALES_ENABLED } from '@/config';
 import type { EventSummary } from '@catedral/types';
 
 const GOLD_SOFT = 'linear-gradient(180deg,#f3c84a,#d29a1f)';
@@ -38,34 +39,50 @@ export default function Home() {
         className="flex justify-center items-center gap-4 md:gap-6 flex-wrap px-4 py-4 md:py-5"
         style={{ background: 'linear-gradient(180deg,#141925,#0d1018)' }}
       >
-        <Link
-          to={`/events/${event.id}`}
-          className="inline-flex items-center gap-3 rounded-[14px] font-extrabold text-[#3a2a06] tracking-[.05em] text-[13px] md:text-[16px] magnetic"
-          style={{
-            padding: '13px 24px',
-            background: GOLD_SOFT,
-            boxShadow: '0 18px 34px -14px rgba(230,184,54,.6), inset 0 1px 0 rgba(255,255,255,.5)',
-          }}
-        >
-          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-            <path d="M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4V9z" />
-            <path d="M9 7v10" />
-          </svg>
-          {isEs ? 'COMPRAR BINGOS' : 'COMPRAR BINGOS'}
-        </Link>
+        {SALES_ENABLED ? (
+          <>
+            <Link
+              to={`/events/${event.id}`}
+              className="inline-flex items-center gap-3 rounded-[14px] font-extrabold text-[#3a2a06] tracking-[.05em] text-[13px] md:text-[16px] magnetic"
+              style={{
+                padding: '13px 24px',
+                background: GOLD_SOFT,
+                boxShadow: '0 18px 34px -14px rgba(230,184,54,.6), inset 0 1px 0 rgba(255,255,255,.5)',
+              }}
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                <path d="M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4V9z" />
+                <path d="M9 7v10" />
+              </svg>
+              {isEs ? 'COMPRAR BINGOS' : 'COMPRAR BINGOS'}
+            </Link>
 
-        <div className="text-white text-center">
-          <div className="font-display leading-none text-[20px] md:text-[30px]">
-            <CountUp value={sold} />
-            <span className="text-white/55 text-[12px] md:text-[15px] font-sans font-bold"> / {total.toLocaleString('es-PY')}</span>
+            <div className="text-white text-center">
+              <div className="font-display leading-none text-[20px] md:text-[30px]">
+                <CountUp value={sold} />
+                <span className="text-white/55 text-[12px] md:text-[15px] font-sans font-bold"> / {total.toLocaleString('es-PY')}</span>
+              </div>
+              <div className="text-[8px] md:text-[10px] tracking-[.18em] uppercase font-heavy text-white/60 mt-1">
+                {isEs ? 'cartones vendidos' : 'cartelas vendidas'}
+              </div>
+              <div className="h-1 md:h-1.5 rounded-full bg-white/15 mt-2 overflow-hidden mx-auto" style={{ maxWidth: 220 }}>
+                <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: GOLD_SOFT }} />
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="text-center text-white py-1.5">
+            <div className="inline-flex items-center gap-2.5 text-gold-500 font-extrabold tracking-[.06em] text-[14px] md:text-[17px]">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 7v5l3 2"/></svg>
+              {isEs ? 'VENTAS PRÓXIMAMENTE' : 'VENDAS EM BREVE'}
+            </div>
+            <p className="text-white/55 text-[11px] md:text-[13px] mt-1.5 max-w-md mx-auto">
+              {isEs
+                ? 'Muy pronto vas a poder comprar tus cartones y participar del bingo.'
+                : 'Em breve você vai poder comprar suas cartelas e participar do bingo.'}
+            </p>
           </div>
-          <div className="text-[8px] md:text-[10px] tracking-[.18em] uppercase font-heavy text-white/60 mt-1">
-            {isEs ? 'cartones vendidos' : 'cartelas vendidas'}
-          </div>
-          <div className="h-1 md:h-1.5 rounded-full bg-white/15 mt-2 overflow-hidden mx-auto" style={{ maxWidth: 220 }}>
-            <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: GOLD_SOFT }} />
-          </div>
-        </div>
+        )}
       </section>
 
       {/* ============ PATROCINADORES ============ */}

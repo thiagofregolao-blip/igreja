@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { formatGs } from '@/lib/format';
 import { DinelcoCard } from '@/components/DinelcoCard';
+import { SALES_ENABLED } from '@/config';
 
 export default function MyTickets() {
   const { t, i18n } = useTranslation();
@@ -28,7 +29,7 @@ export default function MyTickets() {
       {tickets.length === 0 && (
         <div className="card-light rounded-[24px] p-12 text-center">
           <p className="text-muted text-lg mb-6">{t('myTickets.empty')}</p>
-          <Link to="/events" className="btn-gold">Ver eventos</Link>
+          {SALES_ENABLED && <Link to="/events" className="btn-gold">Ver eventos</Link>}
         </div>
       )}
 
@@ -47,8 +48,8 @@ export default function MyTickets() {
               <StatusBadge status={tk.status} />
               <p className="font-display text-2xl text-gold-gradient mt-1.5">{formatGs(tk.totalAmount)}</p>
             </div>
-            {/* Bilhete pendente → permitir concluir/refazer o pagamento */}
-            {tk.status === 'PENDING' && tk.payment && (
+            {/* Bilhete pendente → concluir/refazer pagamento (oculto se vendas desativadas) */}
+            {SALES_ENABLED && tk.status === 'PENDING' && tk.payment && (
               <div className="w-full flex justify-end">
                 <button onClick={() => setPayingTicket(tk)} className="btn-gold !py-2.5">
                   {isEs ? 'Pagar ahora' : 'Pagar agora'}
