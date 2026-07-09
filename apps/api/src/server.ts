@@ -128,14 +128,17 @@ io.on('connection', (socket) => {
 });
 
 server.listen(env.PORT, () => {
-  console.log(`\n🎰 Catedral Bingo — servidor único na porta ${env.PORT}`);
-  console.log(`   🌐 Cliente:  http://localhost:${env.PORT}/`);
-  console.log(`   🛠  Admin:    http://localhost:${env.PORT}/admin`);
-  console.log(`   🔌 API:      http://localhost:${env.PORT}/api/health`);
-  console.log(`   Mode: ${env.NODE_ENV}\n`);
+  // URL pública real (Railway) ou localhost em dev. A porta é só a de escuta interna.
+  const base = isDev ? `http://localhost:${env.PORT}` : env.FRONTEND_URL.replace(/\/$/, '');
+  console.log(`\n🎰 Catedral Bingo — escutando na porta ${env.PORT} (${env.NODE_ENV})`);
+  console.log(`   🌐 Cliente:  ${base}/`);
+  console.log(`   🛠  Admin:    ${base}/admin`);
+  console.log(`   🔌 API:      ${base}/api/health`);
   if (isDev) {
-    console.log(`   📍 Em DEV use os Vite dev servers para hot reload:`);
+    console.log(`\n   📍 Em DEV use os Vite dev servers para hot reload:`);
     console.log(`      Web:    http://localhost:5173`);
     console.log(`      Admin:  http://localhost:5174/admin\n`);
+  } else {
+    console.log('');
   }
 });

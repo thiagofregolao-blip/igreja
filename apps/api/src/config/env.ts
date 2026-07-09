@@ -5,6 +5,12 @@ import path from 'node:path';
 // (src/config em dev, dist/config no build — ../.. chega em apps/api nos dois casos)
 const API_ROOT = path.resolve(__dirname, '../..');
 
+// Em produção web+admin+api são a MESMA origem (serviço único). O Railway expõe
+// automaticamente RAILWAY_PUBLIC_DOMAIN — usamos como default para FRONTEND/ADMIN/API
+// URL, evitando localhost em emails/links/logs sem precisar setar variável manual.
+const railwayDomain = process.env.RAILWAY_PUBLIC_DOMAIN;
+const publicOrigin = railwayDomain ? `https://${railwayDomain}` : undefined;
+
 function required(key: string, fallback?: string): string {
   const v = process.env[key] ?? fallback;
   if (!v) throw new Error(`Missing env var: ${key}`);
@@ -64,9 +70,9 @@ export const env = {
   UPLOAD_DIR: path.resolve(API_ROOT, optional('UPLOAD_DIR', './uploads')),
   MAX_UPLOAD_MB: int('MAX_UPLOAD_MB', 5),
 
-  FRONTEND_URL: optional('FRONTEND_URL', 'http://localhost:5173'),
-  ADMIN_URL: optional('ADMIN_URL', 'http://localhost:5174'),
-  API_URL: optional('API_URL', 'http://localhost:3000'),
+  FRONTEND_URL: optional('FRONTEND_URL', publicOrigin ?? 'http://localhost:5173'),
+  ADMIN_URL: optional('ADMIN_URL', publicOrigin ? `${publicOrigin}/admin` : 'http://localhost:5174'),
+  API_URL: optional('API_URL', publicOrigin ?? 'http://localhost:3000'),
 
   RESERVATION_TTL_MINUTES: int('RESERVATION_TTL_MINUTES', 15),
 };
