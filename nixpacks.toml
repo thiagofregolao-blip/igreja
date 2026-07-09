@@ -2,7 +2,8 @@
 # --include=dev é necessário porque o Railway define NODE_ENV=production e, sem isso,
 # o npm pula as devDependencies (vite, typescript, prisma CLI) e o build quebra.
 [phases.setup]
-nixPkgs = ["nodejs_20", "openssl"]
+# poppler_utils: pdftotext/pdftoppm usados na importação das cartelas de bingo
+nixPkgs = ["nodejs_20", "openssl", "poppler_utils"]
 
 [phases.install]
 cmds = ["npm ci --include=dev"]

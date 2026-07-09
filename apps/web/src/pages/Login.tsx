@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
@@ -7,6 +7,7 @@ import { useAuthStore } from '@/store/auth';
 export default function Login() {
   const { t } = useTranslation();
   const nav = useNavigate();
+  const location = useLocation();
   const [params] = useSearchParams();
   const setSession = useAuthStore((s) => s.setSession);
   const [form, setForm] = useState({ email: '', password: '' });
@@ -45,7 +46,8 @@ export default function Login() {
           {loading ? '...' : t('auth.submit')}
         </button>
       </form>
-      <Link to="/register" className="block text-center text-muted hover:text-gold-700 text-sm mt-6 font-semibold">
+      {/* mantém o ?redirect= para o cadastro voltar ao checkout */}
+      <Link to={`/register${location.search}`} className="block text-center text-muted hover:text-gold-700 text-sm mt-6 font-semibold">
         {t('auth.switchToRegister')}
       </Link>
     </AuthShell>

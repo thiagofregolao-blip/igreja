@@ -1,4 +1,15 @@
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+
 export function Footer() {
+  const { i18n } = useTranslation();
+  const isEs = i18n.language?.startsWith('es');
+  const helpLinks: Array<[string, string]> = [
+    [isEs ? '¿Cómo comprar?' : 'Como comprar?', '/ajuda#como-comprar'],
+    [isEs ? 'Formas de pago' : 'Formas de pagamento', '/ajuda#pagamento'],
+    [isEs ? 'Preguntas frecuentes' : 'Perguntas frequentes', '/ajuda#faq'],
+    [isEs ? 'Términos y condiciones' : 'Termos e condições', '/ajuda#termos'],
+  ];
   return (
     <footer className="relative bg-ink-900 text-white">
       {/* MAIN FOOTER COLUMNS */}
@@ -47,17 +58,12 @@ export function Footer() {
           <div>
             <h4 className="text-[11px] tracking-[.32em] font-extrabold text-gold-500 mb-4">AYUDA</h4>
             <ul className="space-y-2.5 text-sm">
-              {[
-                ['¿Como comprar?', '/#how'],
-                ['Formas de pagamento', '/#how'],
-                ['Perguntas frequentes', '/#'],
-                ['Termos e condições', '/#'],
-              ].map(([label, href]) => (
+              {helpLinks.map(([label, href]) => (
                 <li key={label}>
-                  <a href={href} className="text-white/75 hover:text-gold-500 transition flex items-center justify-between group">
+                  <Link to={href} className="text-white/75 hover:text-gold-500 transition flex items-center justify-between group">
                     {label}
                     <span className="text-white/30 group-hover:text-gold-500 transition">›</span>
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>

@@ -46,10 +46,22 @@ export async function createTicketFromCheckout(input: CheckoutInput, userId: str
       },
     });
 
-    await tx.coupon.updateMany({
-      where: { id: { in: input.couponIds } },
+    // Claim atômico: só entra na compra cupom livre ou reservado POR ESTA sessão.
+    // Se alguém reservou/comprou no meio do caminho, o count não bate e tudo é revertido.
+    const claimed = await tx.coupon.updateMany({
+      where: {
+        id: { in: input.couponIds },
+        eventId: input.eventId,
+        OR: [
+          { status: 'AVAILABLE' },
+          { status: 'RESERVED', reservedSessionId: input.sessionId },
+        ],
+      },
       data: { ticketId: ticket.id, status: 'PENDING' },
     });
+    if (claimed.count !== input.couponIds.length) {
+      throw Conflict('Uma ou mais cartelas não estão mais disponíveis. Revise seu carrinho.');
+    }
 
     const payment = await tx.payment.create({
       data: {

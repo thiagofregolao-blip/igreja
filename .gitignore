@@ -13,3 +13,12 @@ coverage
 uploads
 *.tsbuildinfo
 .vite
+
+# Cartelas de bingo (45MB de PDFs — importadas via script/admin, não versionadas)
+Bingos/
+
+# Config local do Claude Code
+.claude/
+
+# Protótipos de layout (rascunhos, não fazem parte do app)
+mockups/

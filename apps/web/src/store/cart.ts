@@ -7,6 +7,8 @@ interface CartState {
   selectedCouponIds: string[];
   setEvent: (id: string) => void;
   toggleCoupon: (id: string) => void;
+  /** Remove do carrinho tudo que não estiver na lista de reservas válidas (verdade do servidor). */
+  pruneCart: (validIds: string[]) => void;
   clearCart: () => void;
 }
 
@@ -29,6 +31,11 @@ export const useCartStore = create<CartState>()(
           ? s.selectedCouponIds.filter((x) => x !== id)
           : [...s.selectedCouponIds, id],
       })),
+      pruneCart: (validIds) => set((s) => {
+        const valid = new Set(validIds);
+        const pruned = s.selectedCouponIds.filter((id) => valid.has(id));
+        return pruned.length === s.selectedCouponIds.length ? {} : { selectedCouponIds: pruned };
+      }),
       clearCart: () => set({ selectedCouponIds: [] }),
     }),
     { name: 'catedral-cart' },

@@ -155,6 +155,7 @@ model Coupon {
   reservedAt   DateTime?
   reservedBy   String?
   reservedSessionId String?
+  pdfUrl       String?
   ticketId     String?
   ticket       Ticket?      @relation(fields: [ticketId], references: [id])
   cards        Card[]

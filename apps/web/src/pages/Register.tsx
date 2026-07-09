@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
@@ -8,6 +8,7 @@ import { AuthShell, Field } from './Login';
 export default function Register() {
   const { t, i18n } = useTranslation();
   const nav = useNavigate();
+  const location = useLocation();
   const [params] = useSearchParams();
   const setSession = useAuthStore((s) => s.setSession);
   const [form, setForm] = useState({ name: '', cedula: '', phone: '', email: '', password: '' });
@@ -57,7 +58,8 @@ export default function Register() {
           {loading ? '...' : t('auth.submitRegister')}
         </button>
       </form>
-      <Link to="/login" className="block text-center text-white/60 hover:text-gold text-sm mt-6">
+      {/* mantém o ?redirect= ao alternar para o login */}
+      <Link to={`/login${location.search}`} className="block text-center text-white/60 hover:text-gold text-sm mt-6">
         {t('auth.switchToLogin')}
       </Link>
     </AuthShell>

@@ -1,4 +1,9 @@
 import 'dotenv/config';
+import path from 'node:path';
+
+// Raiz do app da API (apps/api), independente do cwd de quem iniciou o processo
+// (src/config em dev, dist/config no build — ../.. chega em apps/api nos dois casos)
+const API_ROOT = path.resolve(__dirname, '../..');
 
 function required(key: string, fallback?: string): string {
   const v = process.env[key] ?? fallback;
@@ -49,14 +54,14 @@ export const env = {
   BANCARD_PUBLIC_KEY: optional('BANCARD_PUBLIC_KEY'),
   BANCARD_WEBHOOK_SECRET: optional('BANCARD_WEBHOOK_SECRET'),
 
-  // ===== Dinelco / Cybersource (cartão online) =====
-  // Pegue no portal da Dinelco/Bepsa: Merchant ID + REST API Key (key id + shared secret).
-  CYBS_RUN_ENV: optional('CYBS_RUN_ENV', 'sandbox'), // 'sandbox' ou 'production'
-  CYBS_MERCHANT_ID: optional('CYBS_MERCHANT_ID'),
-  CYBS_API_KEY_ID: optional('CYBS_API_KEY_ID'),
-  CYBS_SECRET_KEY: optional('CYBS_SECRET_KEY'),
+  // ===== Dinelco — Embedded Checkout da Bepsa (cartão online) =====
+  // DINELCO_SKEY: API key secreta do comércio (portal Bepsa).
+  // DINELCO_BASE_URL: host do ambiente — dev/sandbox por padrão; troque pelo de produção quando a Bepsa liberar.
+  DINELCO_SKEY: optional('DINELCO_SKEY'),
+  DINELCO_BASE_URL: optional('DINELCO_BASE_URL', 'https://dev-sgwf-01.bepsa.com.py'),
 
-  UPLOAD_DIR: optional('UPLOAD_DIR', './uploads'),
+  // Relativo -> resolvido a partir de apps/api (não do cwd); absoluto (ex. /data/uploads) fica como está
+  UPLOAD_DIR: path.resolve(API_ROOT, optional('UPLOAD_DIR', './uploads')),
   MAX_UPLOAD_MB: int('MAX_UPLOAD_MB', 5),
 
   FRONTEND_URL: optional('FRONTEND_URL', 'http://localhost:5173'),

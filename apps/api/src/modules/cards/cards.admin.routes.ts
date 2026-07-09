@@ -2,8 +2,9 @@ import fs from 'node:fs';
 import { Router } from 'express';
 import { asyncHandler } from '../../middleware/asyncHandler.js';
 import { authRequired, requireAdmin } from '../../middleware/auth.js';
-import { uploadCardImages, uploadCsv } from '../../middleware/upload.js';
+import { uploadBingoPdfs, uploadCardImages, uploadCsv } from '../../middleware/upload.js';
 import { importCardNumbersCsv, listEventCards, uploadCards } from './cards.service.js';
+import { importBingoPdfs } from './bingoPdf.service.js';
 
 const router = Router();
 router.use(authRequired, requireAdmin);
@@ -24,6 +25,32 @@ router.post(
     const startCardNumber = req.body.startCardNumber ? Number(req.body.startCardNumber) : undefined;
     const result = await uploadCards(req.params.id, files, startCardNumber);
     res.status(201).json(result);
+  }),
+);
+
+// Importação dos PDFs de bingo (1 PDF = 1 cupom com 2 cartelas, nome NNNN-MMMM.pdf).
+// Envie em lotes (até 200 por request); a numeração impressa dentro do PDF é
+// verificada contra o nome do arquivo antes de qualquer gravação.
+router.post(
+  '/events/:id/cards/import-bingos',
+  uploadBingoPdfs,
+  asyncHandler(async (req, res) => {
+    const files = (req.files as Express.Multer.File[]) || [];
+    if (files.length === 0) {
+      return res.status(400).json({ error: 'BadRequest', message: 'Envie ao menos um PDF no campo "pdfs"' });
+    }
+    const result = await importBingoPdfs(
+      req.params.id,
+      files.map((f) => ({ filePath: f.path, originalName: f.originalname })),
+      {
+        baseCardNumber: req.body.baseCardNumber ? Number(req.body.baseCardNumber) : undefined,
+        force: req.body.force === 'true' || req.body.force === '1',
+      },
+    );
+    for (const f of files) {
+      try { fs.unlinkSync(f.path); } catch {}
+    }
+    res.status(result.failed > 0 ? 207 : 201).json(result);
   }),
 );
 

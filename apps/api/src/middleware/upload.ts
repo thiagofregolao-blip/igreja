@@ -98,6 +98,17 @@ export const uploadCardImages = multer({
   },
 }).array('cards', 500);
 
+export const uploadBingoPdfs = multer({
+  storage: storageFor('bingo-tmp'),
+  limits: { fileSize: env.MAX_UPLOAD_MB * 1024 * 1024, files: 200 },
+  fileFilter: (_req, file, cb) => {
+    if (file.mimetype !== 'application/pdf' && !file.originalname.toLowerCase().endsWith('.pdf')) {
+      return cb(BadRequest('Cartelas de bingo devem ser PDF'));
+    }
+    cb(null, true);
+  },
+}).array('pdfs', 200);
+
 export const uploadCsv = multer({
   storage: storageFor('csv'),
   limits: { fileSize: 5 * 1024 * 1024 },
