@@ -3,11 +3,19 @@ import { Router } from 'express';
 import { asyncHandler } from '../../middleware/asyncHandler.js';
 import { authRequired, requireAdmin } from '../../middleware/auth.js';
 import { uploadBingoPdfs, uploadCardImages, uploadCsv } from '../../middleware/upload.js';
-import { importCardNumbersCsv, listEventCards, uploadCards } from './cards.service.js';
+import { getEventCardsStats, importCardNumbersCsv, listEventCards, uploadCards } from './cards.service.js';
 import { importBingoPdfs } from './bingoPdf.service.js';
 
 const router = Router();
 router.use(authRequired, requireAdmin);
+
+router.get(
+  '/events/:id/cards/stats',
+  asyncHandler(async (req, res) => {
+    const stats = await getEventCardsStats(req.params.id);
+    res.json({ stats });
+  }),
+);
 
 router.get(
   '/events/:id/cards',

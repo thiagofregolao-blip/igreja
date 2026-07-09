@@ -4,6 +4,7 @@ import Login from '@/pages/Login';
 import Dashboard from '@/pages/Dashboard';
 import Events from '@/pages/Events';
 import EventForm from '@/pages/EventForm';
+import Cards from '@/pages/Cards';
 import Payments from '@/pages/Payments';
 import Tickets from '@/pages/Tickets';
 import Users from '@/pages/Users';
@@ -27,6 +28,7 @@ export default function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/events" element={<Events />} />
         <Route path="/events/:id" element={<EventForm />} />
+        <Route path="/cards" element={<Cards />} />
         <Route path="/banners" element={<Banners />} />
         <Route path="/radio" element={<Radio />} />
         <Route path="/payments" element={<Payments />} />

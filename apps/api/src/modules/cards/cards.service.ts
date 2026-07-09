@@ -120,6 +120,33 @@ export async function importCardNumbersCsv(eventId: string, csvContent: string) 
   return { imported, errors };
 }
 
+/** Resumo leve das cartelas do evento (sem puxar todas as linhas). */
+export async function getEventCardsStats(eventId: string) {
+  const event = await prisma.event.findUnique({ where: { id: eventId } });
+  if (!event) throw NotFound('Evento não encontrado');
+
+  const [totalCards, couponsWithPdf, statusGroups] = await Promise.all([
+    prisma.card.count({ where: { coupon: { eventId } } }),
+    prisma.coupon.count({ where: { eventId, pdfUrl: { not: null } } }),
+    prisma.coupon.groupBy({ by: ['status'], where: { eventId }, _count: true }),
+  ]);
+
+  const byStatus: Record<string, number> = { AVAILABLE: 0, RESERVED: 0, PENDING: 0, SOLD: 0 };
+  for (const g of statusGroups) byStatus[g.status] = g._count;
+  const totalCoupons = Object.values(byStatus).reduce((a, b) => a + b, 0);
+
+  return {
+    maxCoupons: event.maxCoupons,
+    cardsPerCoupon: event.cardsPerCoupon,
+    totalCoupons,
+    couponsWithPdf,       // cupons que já têm PDF importado
+    couponsWithoutPdf: totalCoupons - couponsWithPdf,
+    totalCards,           // cartelas (imagens) importadas
+    expectedCards: totalCoupons * event.cardsPerCoupon,
+    byStatus,
+  };
+}
+
 export async function listEventCards(eventId: string) {
   const cards = await prisma.card.findMany({
     where: { coupon: { eventId } },

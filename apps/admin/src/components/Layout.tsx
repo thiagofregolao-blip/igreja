@@ -17,6 +17,7 @@ export function Layout() {
           {[
             ['Dashboard', '/'],
             ['Eventos', '/events'],
+            ['Cartelas', '/cards'],
             ['Banners', '/banners'],
             ['WebRádio', '/radio'],
             ['Pagamentos', '/payments'],
