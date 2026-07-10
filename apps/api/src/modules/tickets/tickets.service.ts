@@ -149,6 +149,47 @@ export async function getMyTicketDetail(ticketId: string, userId: string) {
   return ticket;
 }
 
+/** Gera o PDF do bilhete (cartelas) para download — só o dono, só se pago. */
+export async function generateMyTicketPdf(ticketId: string, userId: string): Promise<{ pdf: Buffer; ticketNumber: number }> {
+  const ticket = await prisma.ticket.findUnique({
+    where: { id: ticketId },
+    include: {
+      user: true,
+      event: { include: { sponsors: { orderBy: { order: 'asc' } } } },
+      coupons: {
+        include: { cards: { include: { drawNumbers: { include: { draw: true } } }, orderBy: { cardIndex: 'asc' } } },
+        orderBy: { couponNumber: 'asc' },
+      },
+    },
+  });
+  if (!ticket) throw NotFound('Bilhete não encontrado');
+  if (ticket.userId !== userId) throw Forbidden();
+  if (ticket.status !== 'PAID') throw BadRequest('Bilhete ainda não foi pago');
+
+  const pdf = await generateTicketPdf({
+    ticketNumber: ticket.ticketNumber,
+    userName: ticket.user.name,
+    userCedula: ticket.user.cedula,
+    eventName: ticket.event.name,
+    eventDate: ticket.event.eventDate,
+    eventLocation: ticket.event.location,
+    startTime: ticket.event.startTime,
+    totalAmount: ticket.totalAmount,
+    coupons: ticket.coupons.map((c) => ({
+      couponNumber: c.couponNumber,
+      cards: c.cards.map((card) => ({
+        cardNumber: card.cardNumber,
+        imageUrl: card.imageUrl,
+        drawNumbers: card.drawNumbers
+          .map((dn) => ({ drawOrder: dn.draw.order, prizeName: dn.draw.prizeName, prizeValue: dn.draw.prizeValue, numbers: dn.numbers }))
+          .sort((a, b) => a.drawOrder - b.drawOrder),
+      })),
+    })),
+    sponsors: ticket.event.sponsors.map((s) => ({ name: s.name, logoUrl: s.logoUrl })),
+  });
+  return { pdf, ticketNumber: ticket.ticketNumber };
+}
+
 export async function confirmPayment(paymentId: string, adminId: string, notes?: string) {
   const payment = await prisma.payment.findUnique({
     where: { id: paymentId },

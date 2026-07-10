@@ -28,11 +28,17 @@ async function settlePayment(paymentId: string): Promise<{ ok: boolean; status: 
   const approved = state.paymentStatus === 'APPROVED' || state.sessionStatus === 'SUCCESS';
   if (!approved) return { ok: false, status: state.paymentStatus ?? state.sessionStatus };
 
-  await confirmPayment(
-    payment.id,
-    'DINELCO',
-    `Cartão aprovado · auth ${state.authorizationCode ?? '-'} · op ${state.operationNumber ?? '-'} · sessão ${payment.bancardRef}`,
-  );
+  try {
+    await confirmPayment(
+      payment.id,
+      'DINELCO',
+      `Cartão aprovado · auth ${state.authorizationCode ?? '-'} · op ${state.operationNumber ?? '-'} · sessão ${payment.bancardRef}`,
+    );
+  } catch (e) {
+    // Corrida entre o postMessage (/confirm) e o /callback: se já confirmou, tudo certo.
+    const fresh = await prisma.payment.findUnique({ where: { id: payment.id } });
+    if (fresh?.status !== 'CONFIRMED') throw e;
+  }
   return { ok: true, status: 'APPROVED' };
 }
 

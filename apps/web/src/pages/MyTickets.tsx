@@ -13,11 +13,32 @@ export default function MyTickets() {
   const [loading, setLoading] = useState(true);
   const [payingTicket, setPayingTicket] = useState<any | null>(null);
 
+  const [downloading, setDownloading] = useState<string | null>(null);
+
   function load() {
     return api.get('/tickets/my').then((r) => { setTickets(r.data.tickets ?? []); setLoading(false); });
   }
 
   useEffect(() => { load(); }, []);
+
+  async function downloadTicket(tk: any) {
+    setDownloading(tk.id);
+    try {
+      const res = await api.get(`/tickets/${tk.id}/pdf`, { responseType: 'blob' });
+      const url = URL.createObjectURL(res.data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `bilhete-${String(tk.ticketNumber).padStart(6, '0')}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      alert(isEs ? 'No se pudo descargar el boleto.' : 'Não foi possível baixar o bilhete.');
+    } finally {
+      setDownloading(null);
+    }
+  }
 
   if (loading) return <div className="text-center py-20 text-gold-700 animate-pulse">Carregando…</div>;
 
@@ -54,6 +75,15 @@ export default function MyTickets() {
                 <button onClick={() => setPayingTicket(tk)} className="btn-gold !py-2.5">
                   {isEs ? 'Pagar ahora' : 'Pagar agora'}
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+            )}
+            {/* Bilhete pago → baixar as cartelas em PDF */}
+            {tk.status === 'PAID' && (
+              <div className="w-full flex justify-end">
+                <button onClick={() => downloadTicket(tk)} disabled={downloading === tk.id} className="btn-gold !py-2.5 disabled:opacity-50">
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                  {downloading === tk.id ? (isEs ? 'Descargando…' : 'Baixando…') : (isEs ? 'Descargar cartones' : 'Baixar cartelas')}
                 </button>
               </div>
             )}

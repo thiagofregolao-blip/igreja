@@ -59,8 +59,8 @@ export async function generateTicketPdf(data: TicketPdfData): Promise<Buffer> {
     doc.roundedRect(40, doc.y, doc.page.width - 80, 80, 8).fillAndStroke('#f9f9f9', GOLD);
     doc.fillColor(TEXT).fontSize(16).font('Helvetica-Bold').text(data.eventName, 56, doc.y - 70);
     doc.fontSize(10).font('Helvetica').fillColor('#444')
-       .text(`📍 ${data.eventLocation}`, 56, doc.y - 50)
-       .text(`📅 ${formatDate(data.eventDate)} • ⏰ ${data.startTime}`, 56, doc.y - 36);
+       .text(`Local: ${data.eventLocation}`, 56, doc.y - 50)
+       .text(`Data: ${formatDate(data.eventDate)}  •  ${data.startTime}`, 56, doc.y - 36);
     doc.fontSize(11).fillColor(TEXT).font('Helvetica-Bold')
        .text(`Comprador: ${data.userName}`, 56, doc.y - 20)
        .text(`Cédula: ${data.userCedula}`, doc.page.width - 250, doc.y - 32, { width: 200, align: 'right' });

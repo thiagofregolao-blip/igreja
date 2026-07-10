@@ -3,7 +3,7 @@ import { asyncHandler } from '../../middleware/asyncHandler.js';
 import { authRequired } from '../../middleware/auth.js';
 import { validate } from '../../middleware/validate.js';
 import { publicUrl, uploadReceipt } from '../../middleware/upload.js';
-import { createTicketFromCheckout, getMyTicketDetail, listMyTickets, uploadReceiptForTicket } from './tickets.service.js';
+import { createTicketFromCheckout, generateMyTicketPdf, getMyTicketDetail, listMyTickets, uploadReceiptForTicket } from './tickets.service.js';
 import { checkoutSchema } from './tickets.schemas.js';
 
 const router = Router();
@@ -31,6 +31,17 @@ router.get(
   asyncHandler(async (req, res) => {
     const ticket = await getMyTicketDetail(req.params.id, req.user!.sub);
     res.json({ ticket });
+  }),
+);
+
+// Download do PDF do bilhete (cartelas) — só o dono, só se pago
+router.get(
+  '/:id/pdf',
+  asyncHandler(async (req, res) => {
+    const { pdf, ticketNumber } = await generateMyTicketPdf(req.params.id, req.user!.sub);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="bilhete-${String(ticketNumber).padStart(6, '0')}.pdf"`);
+    res.send(pdf);
   }),
 );
 
