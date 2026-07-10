@@ -14,6 +14,7 @@ export default function MyTickets() {
   const [payingTicket, setPayingTicket] = useState<any | null>(null);
 
   const [downloading, setDownloading] = useState<string | null>(null);
+  const [resending, setResending] = useState<string | null>(null);
 
   function load() {
     return api.get('/tickets/my').then((r) => { setTickets(r.data.tickets ?? []); setLoading(false); });
@@ -37,6 +38,18 @@ export default function MyTickets() {
       alert(isEs ? 'No se pudo descargar el boleto.' : 'Não foi possível baixar o bilhete.');
     } finally {
       setDownloading(null);
+    }
+  }
+
+  async function resendEmail(tk: any) {
+    setResending(tk.id);
+    try {
+      const { data } = await api.post(`/tickets/${tk.id}/resend-email`);
+      alert(isEs ? `Correo enviado a ${data.to}` : `E-mail enviado para ${data.to}`);
+    } catch (e: any) {
+      alert(e?.response?.data?.message ?? (isEs ? 'No se pudo enviar el correo.' : 'Não foi possível enviar o e-mail.'));
+    } finally {
+      setResending(null);
     }
   }
 
@@ -78,9 +91,14 @@ export default function MyTickets() {
                 </button>
               </div>
             )}
-            {/* Bilhete pago → baixar as cartelas em PDF */}
+            {/* Bilhete pago → baixar as cartelas em PDF + reenviar por e-mail */}
             {tk.status === 'PAID' && (
-              <div className="w-full flex justify-end">
+              <div className="w-full flex justify-end gap-2 flex-wrap">
+                <button onClick={() => resendEmail(tk)} disabled={resending === tk.id}
+                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-line text-muted font-bold text-sm hover:bg-cream-100 transition-colors disabled:opacity-50">
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6l-10 7L2 6M2 6h20v12H2z"/></svg>
+                  {resending === tk.id ? (isEs ? 'Enviando…' : 'Enviando…') : (isEs ? 'Reenviar correo' : 'Reenviar e-mail')}
+                </button>
                 <button onClick={() => downloadTicket(tk)} disabled={downloading === tk.id} className="btn-gold !py-2.5 disabled:opacity-50">
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                   {downloading === tk.id ? (isEs ? 'Descargando…' : 'Baixando…') : (isEs ? 'Descargar cartones' : 'Baixar cartelas')}

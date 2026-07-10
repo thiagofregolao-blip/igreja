@@ -10,10 +10,10 @@ interface EmailOptions {
   attachments?: Array<{ filename: string; content: Buffer }>;
 }
 
-async function send(opts: EmailOptions): Promise<void> {
+async function send(opts: EmailOptions): Promise<boolean> {
   if (!resend) {
     console.warn(`[email:disabled] -> ${opts.to} :: ${opts.subject}`);
-    return;
+    return false;
   }
   try {
     // O Resend NÃO lança em erro de API (ex.: domínio não verificado) — retorna { error }
@@ -26,11 +26,13 @@ async function send(opts: EmailOptions): Promise<void> {
     });
     if (error) {
       console.error(`[email:error] -> ${opts.to} :: ${error.name}: ${error.message}`);
-    } else {
-      console.log(`[email:sent] -> ${opts.to} :: ${opts.subject} (id ${data?.id})`);
+      return false;
     }
+    console.log(`[email:sent] -> ${opts.to} :: ${opts.subject} (id ${data?.id})`);
+    return true;
   } catch (e) {
     console.error('[email:error]', e);
+    return false;
   }
 }
 
@@ -66,7 +68,7 @@ export async function sendTicketConfirmationEmail(
     ? `Tu pago fue confirmado. Adjuntamos tu boleto del evento "${eventName}". ¡Buena suerte!`
     : `Seu pagamento foi confirmado. Em anexo está seu bilhete do evento "${eventName}". Boa sorte!`;
 
-  await send({
+  return send({
     to: email,
     subject,
     html: brandedTemplate(greeting, body, '', ''),

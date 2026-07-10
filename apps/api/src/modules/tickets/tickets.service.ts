@@ -303,3 +303,18 @@ async function notifyTicketConfirmed(ticketId: string) {
     sendTicketWhatsApp(ticket.user.phone, ticket.user.name, ticket.event.name, ticket.ticketNumber, pdfBuffer, lang),
   ]);
 }
+
+/** Reenvia o e-mail do bilhete (com o PDF) — só o dono, só se pago. Retorna se enviou. */
+export async function resendTicketEmail(ticketId: string, userId: string): Promise<{ emailSent: boolean; to: string }> {
+  const { pdf } = await generateMyTicketPdf(ticketId, userId); // valida dono + status pago
+  const ticket = await prisma.ticket.findUnique({
+    where: { id: ticketId },
+    include: { user: true, event: { select: { name: true } } },
+  });
+  if (!ticket) throw NotFound('Bilhete não encontrado');
+  const lang = ticket.user.preferredLanguage as 'pt' | 'es';
+  const emailSent = await sendTicketConfirmationEmail(
+    ticket.user.email, ticket.user.name, ticket.event.name, ticket.ticketNumber, pdf, lang,
+  );
+  return { emailSent, to: ticket.user.email };
+}
