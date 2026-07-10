@@ -1,4 +1,3 @@
-// Vendas do bingo temporariamente DESATIVADAS até a Bepsa liberar o domínio
-// catedralkatuete.com.py no checkout Dinelco (frame-ancestors).
-// Para REATIVAR: troque para `true` e faça deploy.
-export const SALES_ENABLED = false;
+// Vendas do bingo. A Bepsa liberou catedralkatuete.com.py no frame-ancestors do
+// checkout Dinelco (host de TEST dev-sgwf-01), então as vendas estão ATIVAS.
+export const SALES_ENABLED = true;
