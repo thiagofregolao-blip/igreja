@@ -16,13 +16,19 @@ async function send(opts: EmailOptions): Promise<void> {
     return;
   }
   try {
-    await resend.emails.send({
+    // O Resend NÃO lança em erro de API (ex.: domínio não verificado) — retorna { error }
+    const { data, error } = await resend.emails.send({
       from: env.EMAIL_FROM,
       to: opts.to,
       subject: opts.subject,
       html: opts.html,
       attachments: opts.attachments?.map((a) => ({ filename: a.filename, content: a.content })),
     });
+    if (error) {
+      console.error(`[email:error] -> ${opts.to} :: ${error.name}: ${error.message}`);
+    } else {
+      console.log(`[email:sent] -> ${opts.to} :: ${opts.subject} (id ${data?.id})`);
+    }
   } catch (e) {
     console.error('[email:error]', e);
   }
