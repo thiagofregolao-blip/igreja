@@ -45,10 +45,10 @@ export const env = {
   ADMIN_PASSWORD: optional('ADMIN_PASSWORD', 'ChangeMe123!'),
 
   RESEND_API_KEY: optional('RESEND_API_KEY'),
-  // Sem domínio verificado no Resend, só funciona 'onboarding@resend.dev' (e só entrega
-  // ao e-mail dono da conta). Depois de verificar catedralkatuete.com.py, definir
-  // EMAIL_FROM no Railway com o domínio real.
-  EMAIL_FROM: optional('EMAIL_FROM', 'Catedral Sagrado Corazón <onboarding@resend.dev>'),
+  // Domínio catedralkatuete.com.py verificado no Resend — é o padrão. Se EMAIL_FROM
+  // estiver setado no Railway com OUTRO domínio (ex.: .org), o Resend recusa;
+  // nesse caso basta APAGAR a variável no Railway para usar este padrão.
+  EMAIL_FROM: optional('EMAIL_FROM', 'Catedral Sagrado Corazón <no-reply@catedralkatuete.com.py>'),
 
   WHATSAPP_PROVIDER: optional('WHATSAPP_PROVIDER', 'zapi'),
   ZAPI_INSTANCE_ID: optional('ZAPI_INSTANCE_ID'),
